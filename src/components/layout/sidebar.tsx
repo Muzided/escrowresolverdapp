@@ -16,32 +16,33 @@ export function Sidebar({ activeTab, setActiveTab, isMobileNavOpen }: SidebarPro
 
   console.log("isDisputeMember",isDisputeMember)
   const navItems = [
+   
     {
-      id: "overview",
-      label: "Dashboard",
-      icon: LayoutDashboard,
+      id: "dispute",
+      label: "Dispute Queue",
+      icon: BadgeAlert,
     },
     {
       id: "escrows",
-      label: "Escrow",
+      label: "Ongoing Resolutions",
       icon: CreditCard,
     },
-    {
-      id: "create",
-      label: "Create Escrow",
-      icon: Plus,
-    },
-    {
-      id: "dispute",
-      label: "Dispute",
-      icon: BadgeAlert,
-    },
+    // {
+    //   id: "create",
+    //   label: "Create Escrow",
+    //   icon: Plus,
+    // },
+   
     {
       id: "history",
       label: "History",
       icon: ReceiptText,
     },
-    
+    {
+      id: "overview",
+      label: "Profile Stats",
+      icon: LayoutDashboard,
+    },
     // {
     //   id: "dispute",
     //   label: "Dispute Resolution",

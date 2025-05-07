@@ -1,4 +1,71 @@
-export const userEscrows =
+// public/data/disputes.ts
+export interface DisputeStats {
+  totalResolved: number;
+  dailyAdopted: number;
+  maxDailyLimit: number;
+}
+
+export interface AdoptedDispute {
+  id: string;
+  escrowId: string;
+  amount: string;
+  adoptedAt: string;
+  deadline: string;
+  status: 'active' | 'resolved' | 'expired';
+  description: string;
+}
+
+export interface Escrow {
+  escrowId: string;
+  receiver: string;
+  amount: string;
+  jurisdiction:string;
+  paymentType: string;
+  status: string;
+  escrowAddress: string
+
+}
+
+
+export const disputeStats: DisputeStats = {
+  totalResolved: 156,
+  dailyAdopted: 1,
+  maxDailyLimit: 2
+};
+
+export const adoptedDisputes: AdoptedDispute[] = [
+  {
+    id: "DISP-001",
+    escrowId: "ESC-1003",
+    amount: "3200 USDT",
+    adoptedAt: "2024-03-15T10:00:00Z",
+    deadline: "2024-03-22T10:00:00Z",
+    status: "active",
+    description: "Payment dispute regarding milestone completion"
+  },
+  {
+    id: "DISP-002",
+    escrowId: "ESC-1005",
+    amount: "2900 USDT",
+    adoptedAt: "2024-03-14T15:30:00Z",
+    deadline: "2024-03-21T15:30:00Z",
+    status: "active",
+    description: "Quality of work dispute"
+  }
+];
+
+// Sample data for the graph
+export const disputeResolutionHistory = [
+  { month: "Jan", resolved: 12 },
+  { month: "Feb", resolved: 15 },
+  { month: "Mar", resolved: 18 },
+  { month: "Apr", resolved: 14 },
+  { month: "May", resolved: 20 },
+  { month: "Jun", resolved: 16 }
+];
+
+
+export const userEscrows: Escrow[] =
   [
     {
       "escrowId": "ESC-1001",
@@ -86,37 +153,70 @@ export const userTransactionHistory =
       "id": "ESC-1001",
       "date": "24/11/25",
       "type": "Milestone Approval",
-      "tx_hash":"0x98384hs3bdjsf77y87vcxv8sdf",
+      "tx_hash": "0x98384hs3bdjsf77y87vcxv8sdf",
     },
     {
       "id": "ESC-1001",
       "date": "24/11/25",
       "type": "Dispute",
-      "tx_hash":"0x98384hs3bdjsf77y87vcxv8sdf",
+      "tx_hash": "0x98384hs3bdjsf77y87vcxv8sdf",
     },
     {
       "id": "ESC-1001",
       "date": "24/11/25",
       "type": "Escrow Creation",
-      "tx_hash":"0x98384hs3bdjsf77y87vcxv8sdf",
+      "tx_hash": "0x98384hs3bdjsf77y87vcxv8sdf",
     },
     {
       "id": "ESC-1001",
       "date": "24/11/25",
       "type": "Dispute",
-      "tx_hash":"0x98384hs3bdjsf77y87vcxv8sdf",
+      "tx_hash": "0x98384hs3bdjsf77y87vcxv8sdf",
     },
     {
       "id": "ESC-1001",
       "date": "24/11/25",
       "type": "Milestone Approval",
-      "tx_hash":"0x98384hs3bdjsf77y87vcxv8sdf",
+      "tx_hash": "0x98384hs3bdjsf77y87vcxv8sdf",
     },
     {
       "id": "ESC-1001",
       "date": "24/11/25",
       "type": "Escrow Creation",
-      "tx_hash":"0x98384hs3bdjsf77y87vcxv8sdf",
+      "tx_hash": "0x98384hs3bdjsf77y87vcxv8sdf",
     },
-   
+
   ];
+
+
+
+export const disputesDemoList = [
+  {
+    disputeAddress: "0xD1sPuT3AaddR3551234567890abcdefABCDEF1234",
+    escrowAddress: "0xE5cR0WAaddR3550987654321fedcbaFEDCBA5678",
+    reason: "It is about the quality of the produt it is not up to the mark as promised",
+    amount: "100",
+    date: "24/11/25",
+  },
+  {
+    disputeAddress: "0xD1sPuT3AaddR3551234567890abcdefABCDEF1234",
+    escrowAddress: "0xE5cR0WAaddR3550987654321fedcbaFEDCBA5678",
+    reason: "It is about the quality of the produt it is not up to the mark as promised",
+    amount: "100",
+    date: "24/11/25",
+  },
+  {
+    disputeAddress: "0xD1sPuT3AaddR3551234567890abcdefABCDEF1234",
+    escrowAddress: "0xE5cR0WAaddR3550987654321fedcbaFEDCBA5678",
+    reason: "It is about the quality of the produt it is not up to the mark as promised",
+    amount: "100",
+    date: "24/11/25",
+  },
+  {
+    disputeAddress: "0xD1sPuT3AaddR3551234567890abcdefABCDEF1234",
+    escrowAddress: "0xE5cR0WAaddR3550987654321fedcbaFEDCBA5678",
+    reason: "It is about the quality of the produt it is not up to the mark as promised",
+    amount: "100",
+    date: "24/11/25",
+  }
+];

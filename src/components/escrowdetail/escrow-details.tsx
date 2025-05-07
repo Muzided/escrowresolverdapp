@@ -107,53 +107,7 @@ const demoEscrowData: EscrowData = {
 export function EscrowDetails({ escrowId }: { escrowId: string }) {
   const [isLoading, setIsLoading] = useState(false)
   const [escrow, setEscrow] = useState<EscrowData | null>(demoEscrowData)
-  //const { getEscrowDetails } = useFactory()
 
-  // useEffect(() => {
-  //   const fetchEscrowDetails = async () => {
-  //     try {
-  //       setIsLoading(true)
-  //       const escrowData = await getEscrowDetails(escrowId)
-
-  //       // Transform the contract data into our UI format
-  //       const transformedData: EscrowData = {
-  //         id: escrowId,
-  //         status: escrowData.status,
-  //         amount: ethers.formatEther(escrowData.amount) + " ETH",
-  //         receiver: escrowData.receiver,
-  //         sender: escrowData.sender,
-  //         createdAt: new Date(escrowData.createdAt * 1000).toISOString(),
-  //         deadline: new Date(escrowData.deadline * 1000).toISOString(),
-  //         milestones: escrowData.milestones.map((milestone: any) => ({
-  //           id: milestone.id.toString(),
-  //           title: milestone.title,
-  //           amount: ethers.formatEther(milestone.amount) + " ETH",
-  //           status: milestone.status,
-  //           dueDate: new Date(milestone.dueDate * 1000).toISOString(),
-  //           completedAt: milestone.completedAt ? new Date(milestone.completedAt * 1000).toISOString() : null
-  //         })),
-  //         dispute: escrowData.dispute ? {
-  //           status: escrowData.dispute.status,
-  //           messages: escrowData.dispute.messages.map((msg: any) => ({
-  //             id: msg.id.toString(),
-  //             sender: msg.sender,
-  //             message: msg.message,
-  //             timestamp: new Date(msg.timestamp * 1000).toISOString(),
-  //             attachments: msg.attachments
-  //           }))
-  //         } : undefined
-  //       }
-
-  //       setEscrow(transformedData)
-  //     } catch (error) {
-  //       console.error("Error fetching escrow details:", error)
-  //     } finally {
-  //       setIsLoading(false)
-  //     }
-  //   }
-
-  //   fetchEscrowDetails()
-  // }, [escrowId, getEscrowDetails])
 
   if (isLoading) {
     return (

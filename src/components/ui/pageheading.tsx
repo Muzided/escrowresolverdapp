@@ -2,7 +2,7 @@ import React from 'react'
 
 const PageHeading = ({text}:{text:string}) => {
   return (
-    <h1 className='text-3xl font-bold mb-6 '>
+    <h1 className='text-2xl font-semibold mb-6 '>
       {text}
     </h1>
   )

@@ -74,7 +74,7 @@ export function Header({ toggleMobileNav }: HeaderProps) {
       <div className="flex items-center gap-2">
         <ThemeToggle />
 
-        <Button
+        {/* <Button
           variant="ghost"
           size="icon"
           className="text-zinc-500 hover:bg-white hover:shadow-sm hover:text-zinc-900 
@@ -83,7 +83,7 @@ export function Header({ toggleMobileNav }: HeaderProps) {
         >
           <Bell className="h-5 w-5" />
           <span className="sr-only">Notifications</span>
-        </Button>
+        </Button> */}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

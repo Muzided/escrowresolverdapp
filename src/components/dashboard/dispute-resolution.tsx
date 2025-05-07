@@ -25,63 +25,12 @@ import { Switch } from "@/components/ui/switch"
 import { useEscrow } from "@/Hooks/useEscrow"
 import { useDispute } from "@/Hooks/useDispute"
 import { Skeleton } from "../ui/skeleton"
-import { disputesDemoData } from "../../../public/Data/Ecsrows"
+import { disputesDemoList } from "../../../public/Data/Ecsrows"
 import { getStatusStyles } from "../../../utils/helper"
 import { useRouter } from "next/navigation"
 import PageHeading from "../ui/pageheading"
 // Mock data for escrow transactions
-const mockEscrows = [
-  {
-    id: "ESC-001",
-    amount: "1.5 ETH",
-    diputed: false,
-    requested: false,
-    status: "active",
-    receiver: "0x2b3c4d5e6f7g8h9i0j1a",
-    reversal: "0x3c4d5e6f7g8h9i0j1a2b",
-    createdAt: "2023-11-15",
-  },
-  {
-    id: "ESC-002",
-    amount: "0.75 ETH",
-    diputed: false,
-    requested: false,
-    status: "completed",
-    receiver: "0x4d5e6f7g8h9i0j1a2b3c",
-    reversal: "0x5e6f7g8h9i0j1a2b3c4d",
-    createdAt: "2023-11-10",
-  },
-  {
-    id: "ESC-003",
-    amount: "2.0 ETH",
-    diputed: false,
-    requested: false,
-    status: "pending",
-    receiver: "0x6f7g8h9i0j1a2b3c4d5e",
-    reversal: "0x7g8h9i0j1a2b3c4d5e6f",
-    createdAt: "2023-11-20",
-  },
-  {
-    id: "ESC-004",
-    amount: "0.5 ETH",
-    diputed: false,
-    requested: false,
-    status: "expired",
-    receiver: "0x8h9i0j1a2b3c4d5e6f7g",
-    reversal: "0x9i0j1a2b3c4d5e6f7g8h",
-    createdAt: "2023-10-25",
-  },
-  {
-    id: "ESC-005",
-    amount: "3.2 ETH",
-    diputed: false,
-    requested: false,
-    status: "active",
-    receiver: "0x0j1a2b3c4d5e6f7g8h9i",
-    reversal: "0x1a2b3c4d5e6f7g8h9i0j",
-    createdAt: "2023-11-25",
-  },
-]
+
 
 
 type FormattedEscrow = {
@@ -226,8 +175,8 @@ export function DisputeResolution() {
   const limit = 5;
 
   // Filter escrows based on status
-  const filteredEscrows = disputesDemoData;
-
+  const filteredEscrows = disputesDemoList;
+const description="It is about the quality of the produt it is not up to the mark as promised"
 
 
 
@@ -238,7 +187,7 @@ export function DisputeResolution() {
 
   return (
     <div className="space-y-4">
-      
+       <PageHeading text="Available Disputes" /> 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <Button
           variant="outline"
@@ -282,9 +231,9 @@ export function DisputeResolution() {
                 >
                   <TableHead className="text-zinc-500 dark:text-zinc-400">Dispute Address</TableHead>
                   <TableHead className="text-zinc-500 dark:text-zinc-400">	Escrow Address</TableHead>
-                  <TableHead className="text-zinc-500 dark:text-zinc-400">Disputer Address</TableHead>
-                  <TableHead className="text-zinc-500 dark:text-zinc-400">	Status</TableHead>
-                  <TableHead className="text-zinc-500 dark:text-zinc-400">	Unread Messages</TableHead>
+                  <TableHead className="text-zinc-500 dark:text-zinc-400">Reason</TableHead>
+                  <TableHead className="text-zinc-500 dark:text-zinc-400">	Amount</TableHead>
+                  <TableHead className="text-zinc-500 dark:text-zinc-400">	Date</TableHead>
                   <TableHead className="text-zinc-500 dark:text-zinc-400">View Details</TableHead>
 
                 </TableRow>
@@ -318,28 +267,43 @@ export function DisputeResolution() {
                       </TableCell>
 
 
-                      {escrow.disputerAddress ?
+                        
                         <TableCell>
-                          {escrow.disputerAddress?.slice(0, 8)}...{escrow.disputerAddress?.slice(-7)}
-                        </TableCell> :
-                        <TableCell>
-                          "Not Adopted"
-                        </TableCell>}
+                        {escrow.reason.slice(0, 12)}...
+                          <Dialog>
+                      <DialogTrigger asChild>
+                        <button className="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                          Read More
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Dispute Details</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 mt-4">
+                          <div>
+                            {escrow.reason}
+                          </div>
+                        
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                        </TableCell>
 
                       <TableCell>
-                        <Badge variant="outline" className={getStatusStyles(escrow.status)}>
-                          {escrow.status}
-                        </Badge>
+                        
+                          {escrow.amount}
+                       
                       </TableCell>
                       <TableCell>
-                        {escrow.unreadMessages}
+                        {escrow.date}
                       </TableCell>
 
 
 
                       {/* viewEscrow details */}
 
-
+<div className="flex gap-2">
                       <Button
                         size="sm"
                         // disabled={loadingEscrows[escrow.escrowAddress] || false}
@@ -348,7 +312,15 @@ export function DisputeResolution() {
                       >
                         View Details
                       </Button>
-
+                      <Button
+                        size="sm"
+                        // disabled={loadingEscrows[escrow.escrowAddress] || false}
+                        className="bg-blue-600 text-white hover:bg-blue-700 my-2 w dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                       
+                      >
+                        Adopt Dispute
+                      </Button>
+                      </div>
 
 
 

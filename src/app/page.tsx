@@ -52,7 +52,7 @@ export default function Dashboard() {
           <ConnectPage/>
            :
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <DashboardHeader activeTab={activeTab} />
+            {/* <DashboardHeader activeTab={activeTab} /> */}
 
             <TabsContent value="overview" className="mt-0">
            
