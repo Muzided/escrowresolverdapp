@@ -326,7 +326,7 @@ const ActiveDisputeDetails: React.FC<Props> = ({
                       <Button
                         size="sm"
                         disabled={loadingEscrows[escrow.escrowAddress] || false}
-                        className="bg-green-600 cursor-pointer text-white hover:bg-green-700 my-2 w dark:bg-green-600 dark:text-white dark:hover:bg-green-700"
+                        className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
 
                       >
                         <MessageSquare /> Chat
@@ -361,7 +361,7 @@ const ActiveDisputeDetails: React.FC<Props> = ({
                   <Button
                     size="sm"
                     disabled={loadingEscrows[escrow.escrowAddress] || false}
-                    className="bg-blue-600 text-white hover:bg-blue-700 my-2 w dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                    className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
                     onClick={() => navgateToDetailPage("3f4#fsd4")}
                   >
                     View Details

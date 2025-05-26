@@ -25,8 +25,8 @@ export function StatsCard({ title, description, value }: StatsCardProps) {
       </CardHeader>
       <CardContent>
         <div
-          className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent
-          dark:from-blue-400 dark:to-blue-500"
+          className="text-3xl font-bold bg-gradient-to-r from-[#9C5F2A] to-[#9C5F2A] bg-clip-text text-transparent
+          dark:from-[#9C5F2A] dark:to-[#9C5F2A]"
         >
           {value}
         </div>

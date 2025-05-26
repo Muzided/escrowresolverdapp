@@ -55,16 +55,16 @@ export function Header({ toggleMobileNav }: HeaderProps) {
             <Lottie animationData={animationData} className="w-10 h-10" />
           </div> */}
           <div className="w-10 h-10 relative">
-            <div className="absolute inset-0 bg-blue-200/30 dark:bg-blue-600/20 rounded-full blur-md"></div>
-            <div className="relative z-10 w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-400 rounded-full flex items-center justify-center shadow-lg shadow-blue-200/50 dark:shadow-blue-600/20">
+            <div className="absolute inset-0 bg-[#9C5F2A]/30 dark:bg-[#9C5F2A]/20 rounded-full blur-md"></div>
+          
               <Image src={logo} alt="Logo" width={32} height={32} className="w-8 h-8" />
-            </div>
+         
           </div>
           <span
             className="hidden sm:inline bg-gradient-to-r from-zinc-800 to-zinc-600 bg-clip-text text-transparent 
             dark:from-white dark:to-zinc-300"
           >
-            MultiSig Escrow
+            Resolver Dashboard
           </span>
         </Link>
 
@@ -93,7 +93,7 @@ export function Header({ toggleMobileNav }: HeaderProps) {
                 transition-all duration-200 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white 
                 dark:hover:shadow-none"
             >
-              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 shadow-md"></div>
+              <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#9C5F2A] to-[#9C5F2A] shadow-md"></div>
               <span className="hidden sm:inline text-zinc-700 dark:text-zinc-300">{isConnected ? 
               `${address?.slice(0, 8)}...${address?.slice(-7)}` : 'Connect Wallet'}</span>
               <ChevronDown className="h-4 w-4" />

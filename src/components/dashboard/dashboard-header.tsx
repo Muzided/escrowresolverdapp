@@ -41,7 +41,7 @@ export function DashboardHeader({ activeTab }: DashboardHeaderProps) {
 
       {activeTab !== "create" && (
         <Button
-          className="bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md 
+          className="bg-gradient-to-r from-[#9C5F2A] to-[#9C5F2A] text-white shadow-md 
           hover:shadow-lg hover:from-blue-500 hover:to-blue-400 transition-all duration-300
           dark:bg-blue-600 dark:from-blue-600 dark:to-blue-600 dark:text-white dark:hover:bg-blue-700 
           dark:hover:from-blue-700 dark:hover:to-blue-700 dark:shadow-none dark:hover:shadow-none"

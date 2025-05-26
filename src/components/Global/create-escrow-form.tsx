@@ -232,7 +232,7 @@ export function CreateEscrowForm() {
                   placeholder="e.g. 1.5"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="border-zinc-200 bg-white shadow-sm text-zinc-900 focus-visible:ring-blue-500 
+                  className="border-zinc-200 bg-white shadow-sm text-zinc-900 focus-visible:ring-[#9C5F2A] 
                     transition-all duration-200 hover:border-zinc-300 focus:shadow-md
                     dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:shadow-none dark:hover:border-zinc-600"
                   required
@@ -250,7 +250,7 @@ export function CreateEscrowForm() {
                     placeholder="e.g. 1.5"
                     value={totalMilestoneAmount}
                     onChange={(e) => handleTotalAmountChange(e.target.value)}
-                    className="border-zinc-200 bg-white shadow-sm text-zinc-900 focus-visible:ring-blue-500 
+                    className="border-zinc-200 bg-white shadow-sm text-zinc-900 focus-visible:ring-[#9C5F2A] 
                       transition-all duration-200 hover:border-zinc-300 focus:shadow-md
                       dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:shadow-none dark:hover:border-zinc-600"
                     required
@@ -339,7 +339,7 @@ export function CreateEscrowForm() {
                 placeholder="Wallet address (0x...)"
                 value={receiver}
                 onChange={handleReceiverChange}
-                className="border-zinc-200 bg-white shadow-sm text-zinc-900 focus-visible:ring-blue-500 
+                className="border-zinc-200 bg-white shadow-sm text-zinc-900 focus-visible:ring-[#9C5F2A] 
                   transition-all duration-200 hover:border-zinc-300 focus:shadow-md
                   dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:shadow-none dark:hover:border-zinc-600"
                 required
@@ -373,7 +373,7 @@ export function CreateEscrowForm() {
                 timeCaption="Time"
                 dateFormat="yyyy-MM-dd HH:mm"
                 minDate={now}
-                className="border-zinc-200 p-1.5 text-center rounded-b-md cursor-pointer dark:hover:bg-zinc-600 bg-white shadow-sm text-zinc-900 focus-visible:ring-blue-500 
+                className="border-zinc-200 p-1.5 text-center rounded-b-md cursor-pointer dark:hover:bg-zinc-600 bg-white shadow-sm text-zinc-900 focus-visible:ring-[#9C5F2A] 
                   transition-all duration-200 hover:border-zinc-300 focus:shadow-md
                   dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:shadow-none dark:hover:border-zinc-600"
                 required
@@ -460,7 +460,7 @@ export function CreateEscrowForm() {
                 placeholder="Observer wallet address (0x...)"
                 value={observer}
                 onChange={(e) => setObserver(e.target.value)}
-                className="border-zinc-200 bg-white shadow-sm text-zinc-900 focus-visible:ring-blue-500 
+                className="border-zinc-200 bg-white shadow-sm text-zinc-900 focus-visible:ring-[#9C5F2A] 
                   transition-all duration-200 hover:border-zinc-300 focus:shadow-md
                   dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:shadow-none dark:hover:border-zinc-600"
               />
@@ -533,13 +533,13 @@ export function CreateEscrowForm() {
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
                 <div className={`flex items-center justify-center w-8 h-8 lg:w-10 lg:h-10 rounded-full 
-                  ${currentStep > index + 1 ? 'bg-blue-600 text-white' : 
-                    currentStep === index + 1 ? 'bg-blue-600 text-white' : 
+                  ${currentStep > index + 1 ? 'bg-[#9C5F2A] text-white' : 
+                    currentStep === index + 1 ? 'bg-[#9C5F2A] text-white' : 
                     'bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'}`}>
                   {step.id}
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={` w-4 md:w-12 lg:w-16 h-1 mx-2 lg:mx-4 ${currentStep > index + 1 ? 'bg-blue-600' : 'bg-zinc-200 dark:bg-zinc-700'}`} />
+                  <div className={` w-4 md:w-12 lg:w-16 h-1 mx-2 lg:mx-4 ${currentStep > index + 1 ? 'bg-[#9C5F2A]' : 'bg-zinc-200 dark:bg-zinc-700'}`} />
                 )}
               </div>
             ))}
@@ -564,10 +564,10 @@ export function CreateEscrowForm() {
             {currentStep === totalSteps ? (
               <Button
                 type="submit"
-                className="bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md hover:shadow-lg 
-                  hover:from-blue-500 hover:to-blue-400 transition-all duration-300 px-6
-                  dark:bg-blue-600 dark:from-blue-600 dark:to-blue-600 dark:text-white dark:hover:bg-blue-700 
-                  dark:hover:from-blue-700 dark:hover:to-blue-700 dark:shadow-none dark:hover:shadow-none"
+                className="bg-gradient-to-r from-[#9C5F2A] to-[#9C5F2A] text-white shadow-md hover:shadow-lg 
+                  hover:from-[#9C5F2A] hover:to-[#9C5F2A] transition-all duration-300 px-6
+                  dark:bg-[#9C5F2A] dark:from-[#9C5F2A] dark:to-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A] 
+                  dark:hover:from-[#9C5F2A] dark:hover:to-[#9C5F2A] dark:shadow-none dark:hover:shadow-none"
                 disabled={isSubmitting || !legalAgreement}
               >
                 {isSubmitting ? "Creating..." : "Create Escrow"}
@@ -576,10 +576,10 @@ export function CreateEscrowForm() {
               <Button
                 type="button"
                 onClick={nextStep}
-                className="bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md hover:shadow-lg 
-                  hover:from-blue-500 hover:to-blue-400 transition-all duration-300 px-6
-                  dark:bg-blue-600 dark:from-blue-600 dark:to-blue-600 dark:text-white dark:hover:bg-blue-700 
-                  dark:hover:from-blue-700 dark:hover:to-blue-700 dark:shadow-none dark:hover:shadow-none"
+                className="bg-gradient-to-r from-[#9C5F2A] to-[#9C5F2A] text-white shadow-md hover:shadow-lg 
+                  hover:from-[#9C5F2A] hover:to-[#9C5F2A] transition-all duration-300 px-6
+                  dark:bg-[#9C5F2A] dark:from-[#9C5F2A] dark:to-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A] 
+                  dark:hover:from-[#9C5F2A] dark:hover:to-[#9C5F2A] dark:shadow-none dark:hover:shadow-none"
               >
                 Next
                 <ChevronRight className="ml-2 h-4 w-4" />

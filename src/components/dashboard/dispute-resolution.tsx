@@ -272,7 +272,7 @@ const description="It is about the quality of the produt it is not up to the mar
                         {escrow.reason.slice(0, 12)}...
                           <Dialog>
                       <DialogTrigger asChild>
-                        <button className="ml-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                        <button className="ml-1 text-[#9C5F2A] hover:text-[#9C5F2A] dark:text-[#9C5F2A] dark:hover:text-[#9C5F2A]">
                           Read More
                         </button>
                       </DialogTrigger>
@@ -307,7 +307,7 @@ const description="It is about the quality of the produt it is not up to the mar
                       <Button
                         size="sm"
                         // disabled={loadingEscrows[escrow.escrowAddress] || false}
-                        className="bg-blue-600 text-white hover:bg-blue-700 my-2 w dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                        className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
                         onClick={() => navgateToDetailPage("3f4#fsd4")}
                       >
                         View Details
@@ -315,7 +315,7 @@ const description="It is about the quality of the produt it is not up to the mar
                       <Button
                         size="sm"
                         // disabled={loadingEscrows[escrow.escrowAddress] || false}
-                        className="bg-blue-600 text-white hover:bg-blue-700 my-2 w dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700"
+                        className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
                        
                       >
                         Adopt Dispute

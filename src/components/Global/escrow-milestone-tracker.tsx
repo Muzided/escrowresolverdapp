@@ -37,7 +37,7 @@ export function EscrowMilestoneTracker({ escrow }: EscrowMilestoneTrackerProps) 
       case "completed":
         return <CheckCircle2 className="h-6 w-6 text-green-500" />
       case "active":
-        return <Circle className="h-6 w-6 text-blue-500 animate-pulse" />
+        return <Circle className="h-6 w-6 text-[#9C5F2A] animate-pulse" />
       case "upcoming":
         return <Clock className="h-6 w-6 text-gray-400" />
       default:

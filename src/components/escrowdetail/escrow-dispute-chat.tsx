@@ -61,7 +61,7 @@ export function EscrowDisputeChat({ dispute }: EscrowDisputeChatProps) {
       <Card
         className={`max-w-[75%] ${
           isCurrentUser
-            ? 'bg-blue-100 dark:bg-blue-900/30 rounded-tr-none ml-auto'
+            ? 'bg-[#9C5F2A]/10 dark:bg-[#9C5F2A]/30 rounded-tr-none ml-auto'
             : 'bg-gray-100 dark:bg-zinc-800 rounded-tl-none mr-auto'
         }`}
       >
@@ -85,7 +85,7 @@ export function EscrowDisputeChat({ dispute }: EscrowDisputeChatProps) {
                   href={attachment}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-blue-500 hover:underline"
+                  className="text-sm text-[#9C5F2A] hover:underline"
                 >
                   Attachment {index + 1}
                 </a>

@@ -24,7 +24,7 @@ export const getStatusStyles = (status: string) => {
     case "pending":
       return `${baseClasses} border-yellow-500 bg-yellow-500/10 text-yellow-600 dark:border-yellow-500 dark:text-yellow-500`
     case "completed":
-      return `${baseClasses} border-blue-500 bg-blue-500/10 text-blue-600 dark:border-blue-500 dark:text-blue-500`
+      return `${baseClasses} border-[#9C5F2A] bg-[#9C5F2A]/10 text-[#9C5F2A] dark:border-[#9C5F2A] dark:text-[#9C5F2A]`
     case "in dispute":
       return `${baseClasses} border-red-500 bg-red-500/10 text-red-600 dark:border-red-500 dark:text-red-500`
     case "expired":

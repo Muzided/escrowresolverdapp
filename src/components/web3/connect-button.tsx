@@ -14,10 +14,10 @@ export function ConnectWalletButton() {
     return (
         <Button
             onClick={openAppkit}
-            className="w-full bg-gradient-to-r from-blue-700 to-blue-500 hover:from-blue-600 hover:to-blue-400 
+            className="w-full bg-gradient-to-r from-[#9C5F2A] to-[#9C5F2A] hover:from-[#9C5F2A] hover:to-[#9C5F2A] 
               text-white font-semibold py-6 rounded-xl 
-              shadow-md hover:shadow-lg shadow-blue-300/30 hover:shadow-blue-300/40
-              dark:shadow-lg dark:hover:shadow-lg dark:shadow-blue-900/30 dark:hover:shadow-blue-700/40 
+              shadow-md hover:shadow-lg shadow-[#9C5F2A]/30 hover:shadow-[#9C5F2A]/40
+              dark:shadow-lg dark:hover:shadow-lg dark:shadow-[#9C5F2A]/30 dark:hover:shadow-[#9C5F2A]/40 
               transition-all duration-300"
         >
             {isConnected ?`${address?.slice(0, 8)}...${address?.slice(-7)}` : 'Connect Wallet'}
