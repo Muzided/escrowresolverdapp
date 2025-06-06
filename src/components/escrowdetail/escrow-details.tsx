@@ -1,113 +1,63 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { EscrowMilestoneTracker } from "../Global/escrow-milestone-tracker"
 import { EscrowDisputeChat } from "./escrow-dispute-chat"
 import { EscrowGeneralInfo } from "./escrow-general-info"
-import { useFactory } from "@/Hooks/useFactory"
-import { ethers } from "ethers"
+import { useQuery } from "@tanstack/react-query"
+import DOMPurify from 'dompurify'
+import { getEscrowDetailsResponse } from "@/types/escrow"
+import { fetchEscrowDetails, getLegalDocuments } from "@/services/Api/escrow/escrow"
+import { useEscrow } from "@/Hooks/useEscrow"
+import { ContractMilestone } from "@/types/contract"
+import { useAppKitAccount } from "@reown/appkit/react"
 
-interface EscrowData {
-  escrow: {
-    id: string
-    amount: string
-    deadline: string
-    receiver: string
-    sender: string
-    status: string
-    createdAt: string
-  }
-  milestones: Array<{
-    id: string
-    title: string
-    amount: string
-    status: "completed" | "active" | "upcoming"
-    dueDate: string
-    completedAt: string | null
-  }>
-  dispute?: {
-    status: string
-    messages: Array<{
-      id: string
-      sender: string
-      message: string
-      timestamp: string
-      attachments: string[]
-    }>
-  }
-}
-const demoEscrowData: EscrowData = {
-  escrow: {
-    id: "ESC-1001",
-    amount: "20000000", // 5 ETH or similar if using wei
-    deadline: "2025-05-30T23:59:59Z",
-    receiver: "0x9aF3dE59B92E59B1A24375Bc32dD1875Bd51D4B2",
-    sender: "0x84F1C7E182B3C9bF0Df4Eb1C5a6fC112FCB7A23a",
-    status: "active",
-    createdAt: "2025-04-15T14:33:22Z",
-  },
-  milestones: [
-    {
-      id: "ms-01",
-      title: "Design Delivery",
-      amount: "1.5",
-      status: "completed",
-      dueDate: "2025-04-20T00:00:00Z",
-      completedAt: "2025-04-19T10:00:00Z",
-    },
-    {
-      id: "ms-02",
-      title: "Development Phase",
-      amount: "2.0",
-      status: "active",
-      dueDate: "2025-05-05T00:00:00Z",
-      completedAt: null,
-    },
-    {
-      id: "ms-03",
-      title: "Testing & Review",
-      amount: "1.0",
-      status: "upcoming",
-      dueDate: "2025-05-20T00:00:00Z",
-      completedAt: null,
-    },
-    {
-      id: "ms-04",
-      title: "Final Delivery",
-      amount: "0.5",
-      status: "upcoming",
-      dueDate: "2025-05-30T00:00:00Z",
-      completedAt: null,
-    },
-  ],
-  dispute: {
-    status: "open",
-    messages: [
-      {
-        id: "msg-001",
-        sender: "0x84F1C7E182B3C9bF0Df4Eb1C5a6fC112FCB7A23a",
-        message: "Milestone 2 has bugs and needs to be revised.",
-        timestamp: "2025-05-01T11:45:00Z",
-        attachments: [],
-      },
-      {
-        id: "msg-002",
-        sender: "0x9aF3dE59B92E59B1A24375Bc32dD1875Bd51D4B2",
-        message: "Acknowledged. Working on fixes.",
-        timestamp: "2025-05-01T12:10:00Z",
-        attachments: ["https://example.com/fix-screenshot.png"],
-      },
-    ],
-  },
-};
+import { toast } from "react-toastify"
+import { Button } from "@/components/ui/button"
+import { useEscrowRefresh } from "@/context/EscrowContext"
+
+
+
 
 export function EscrowDetails({ escrowId }: { escrowId: string }) {
-  const [isLoading, setIsLoading] = useState(false)
-  const [escrow, setEscrow] = useState<EscrowData | null>(demoEscrowData)
+  const { refreshTrigger } = useEscrowRefresh();
+  const { getMileStones } = useEscrow();
+  const [escrowOnChainDetails, setEscrowOnChainDetails] = useState<ContractMilestone[]>([]);
+  const [showContractTerms, setShowContractTerms] = useState(false);
+  const [contractContent, setContractContent] = useState("");
+  const [originalContractContent, setOriginalContractContent] = useState("");
 
+  const { address } = useAppKitAccount();
+
+  const fetchEscrowDetailsFromBlockchain = useCallback(async (escrowId: string) => {
+    const response = await getMileStones(escrowId);
+    setEscrowOnChainDetails(response);
+  }, [getMileStones]);
+
+  useEffect(() => {
+    if (escrowId) {
+      fetchEscrowDetailsFromBlockchain(escrowId);
+    }
+  }, [escrowId, refreshTrigger]);
+
+  const { data: escrowDetails, isLoading, error } = useQuery<getEscrowDetailsResponse>({
+    queryKey: ['escrowDetails', escrowId],
+    queryFn: async () => {
+      const response = await fetchEscrowDetails(escrowId);
+      return response.data;
+    },
+    enabled: !!escrowId, // Only run query when address is available
+  });
 
   if (isLoading) {
     return (
@@ -119,10 +69,10 @@ export function EscrowDetails({ escrowId }: { escrowId: string }) {
           <Skeleton className="h-96" />
         </div>
       </div>
-    )
+    );
   }
 
-  if (!escrow) {
+  if (!escrowDetails) {
     return (
       <div className="container mx-auto p-1 md:p-4">
         <Card>
@@ -131,43 +81,96 @@ export function EscrowDetails({ escrowId }: { escrowId: string }) {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
+  const handleSignContract = async (escrowAddress: string) => {
+    try {
+      const legalDocs = await getLegalDocuments(escrowAddress);
+      const sanitizedContent = DOMPurify.sanitize(legalDocs?.data?.document || "");
+      setOriginalContractContent(sanitizedContent);
+      setContractContent(sanitizedContent);
+      setShowContractTerms(true);
+    } catch (error) {
+      console.error("Error fetching legal documents:", error);
+      toast.error("Failed to fetch contract document");
+    }
+  };
+  console.log("escrowDetails",escrowOnChainDetails)
   return (
     <div className="container mx-auto p-1 md:p-4 space-y-6">
-      <div className="flex flex-col gap-4 shadow-xl border border-gray-500/10 rounded-lg  md:px-4 py-6">
-        {/* <CardHeader>
-          <CardTitle className="text-2xl">Escrow Details</CardTitle>
-        </CardHeader> */}
+      <div className="flex flex-col gap-4 shadow-xl border border-gray-500/10 rounded-lg md:px-4 py-6">
         <CardContent>
           <Tabs defaultValue="general" className="w-full">
-            <TabsList className="grid w-full grid-cols-1 md:grid-cols-3 mb-6">
-              <TabsTrigger className=" " value="general">Milestones & Payments</TabsTrigger>
-              <TabsTrigger className=" "  value="milestones">Messages & Files</TabsTrigger>
-               
-                <TabsTrigger className=" "  value="dispute">Terms & Docs</TabsTrigger>
-              
+            <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 mb-6">
+              <TabsTrigger className="data-[state=active]:bg-[#BB7333] data-[state=active]:text-white" value="general">Milestones & Payments</TabsTrigger>
+              {/* <TabsTrigger className="data-[state=active]:bg-[#BB7333] data-[state=active]:text-white" value="chat">Chat</TabsTrigger> */}
+
+              <TabsTrigger className="data-[state=active]:bg-[#BB7333] data-[state=active]:text-white" value="dispute">Terms & Docs</TabsTrigger>
             </TabsList>
             <TabsContent value="general">
               <div className="flex flex-col gap-4">
-                <EscrowGeneralInfo escrow={escrow.escrow} />
-                <EscrowMilestoneTracker escrow={escrow} />
+                {escrowDetails?.escrow && <EscrowGeneralInfo {...escrowDetails.escrow} />}
+                {escrowDetails?.escrow && escrowOnChainDetails && escrowOnChainDetails.length > 0 && escrowOnChainDetails[0].id !== '' && 
+                <EscrowMilestoneTracker 
+              //  escrow={escrowDetails} 
+                escrowOnChainDetails={escrowOnChainDetails} 
+                escrowDetails={escrowDetails}
+                userType={escrowDetails.escrow.creator_walletaddress.toLowerCase() === String(address).toLowerCase() ? "creator" : "receiver"}
+                 />}
               </div>
             </TabsContent>
-            <TabsContent value="milestones">
-              <div className="w-full ">
-              <EscrowDisputeChat dispute={escrow.dispute || { status: "closed", messages: [] }} />
+            {/* <TabsContent value="chat">
+              <EscrowDisputeChat/>
+            </TabsContent> */}
+            <TabsContent value="dispute">
+              <div className="space-y-6">
+                <div className="grid gap-4">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-xl">Contract Documents</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                          <div className="space-y-1">
+                            <h3 className="font-medium">Escrow Contract</h3>
+                            <p className="text-sm text-gray-500">View the complete contract terms and conditions</p>
+                          </div>
+                          <Button 
+                            onClick={() => handleSignContract(escrowDetails?.escrow?.escrow_contract_address || '')}
+                            variant="outline"
+                            className="border-[#BB7333] text-[#BB7333] hover:bg-[#BB7333] hover:text-white"
+                          >
+                            View Contract
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
+
+              <Dialog open={showContractTerms} onOpenChange={setShowContractTerms}>
+                <DialogContent className="w-full lg:min-w-3xl max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Contract Terms</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div
+                      className="prose max-w-none p-4 border rounded-lg min-h-[400px] overflow-y-auto bg-white dark:bg-zinc-900"
+                      dangerouslySetInnerHTML={{ __html: contractContent }}
+                      style={{ pointerEvents: 'none' }}
+                      contentEditable={false}
+                      suppressContentEditableWarning={true}
+                    />
+                  </div>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
-       
-              <TabsContent value="dispute">
-               
-              </TabsContent>
-            
           </Tabs>
         </CardContent>
       </div>
     </div>
-  )
+  );
 } 

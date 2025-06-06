@@ -5,7 +5,6 @@ import { Tabs, TabsContent } from "@/components/ui/tabs"
 
 import { Header } from "@/components/layout/header"
 import { Sidebar } from "@/components/layout/sidebar"
-import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { OverviewTab } from "@/components/dashboard/overview-tab"
 import { TransactionsTab } from "@/components/dashboard/transaction-tab"
 import { CreateTab } from "@/components/dashboard/create-tab"
@@ -14,12 +13,13 @@ import { Escrows } from "@/components/dashboard/Escrows"
 import ConnectPage from "@/components/dashboard/ConnectPage"
 import { useAppKitAccount } from "@reown/appkit/react"
 import DaoTab from "@/components/dashboard/doa-tab"
+import { useUser } from "@/context/userContext"
 
 export default function Dashboard() {
   const [isClient, setIsClient] = useState(false)
-  const [activeTab, setActiveTab] = useState("overview")
+  const [activeTab, setActiveTab] = useState("dispute")
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
-
+  const { isAuthenticated} = useUser()
   const { address, isConnected } = useAppKitAccount();
 
   useEffect(() => {
@@ -48,7 +48,7 @@ export default function Dashboard() {
 
         {/* Main content area with left padding to account for fixed sidebar */}
         <main className="flex-1 overflow-auto p-4 md:p-6 md:ml-64">
-        {!isConnected? 
+        {!isAuthenticated? 
           <ConnectPage/>
            :
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">

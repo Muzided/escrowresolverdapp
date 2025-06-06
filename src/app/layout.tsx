@@ -5,7 +5,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Poppins } from "next/font/google";
 import './globals.css'
 import { AppKit } from '@/context/appkit';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Web3Provider } from '@/context/Web3Context';
+import { UserProvider } from '@/context/userContext';
+import { EscrowProvider } from '@/context/EscrowContext';
+
+const queryClient = new QueryClient()
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
@@ -49,12 +54,18 @@ export default function RootLayout({
           toastStyle={customToastStyle}
         />
         <ThemeProvider attribute="class" defaultTheme="dark" >
+        <QueryClientProvider client={queryClient}>
           <AppKit>
 
             <Web3Provider>
+            <UserProvider>
+            <EscrowProvider>
               {children}
+              </EscrowProvider>
+              </UserProvider>
             </Web3Provider>
           </AppKit>
+          </QueryClientProvider>
         </ThemeProvider>
       </body>
     </html>

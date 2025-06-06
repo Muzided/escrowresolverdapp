@@ -33,16 +33,16 @@ export function Sidebar({ activeTab, setActiveTab, isMobileNavOpen }: SidebarPro
     //   icon: Plus,
     // },
    
-    {
-      id: "history",
-      label: "History",
-      icon: ReceiptText,
-    },
-    {
-      id: "overview",
-      label: "Profile Stats",
-      icon: LayoutDashboard,
-    },
+    // {
+    //   id: "history",
+    //   label: "History",
+    //   icon: ReceiptText,
+    // },
+    // {
+    //   id: "overview",
+    //   label: "Profile Stats",
+    //   icon: LayoutDashboard,
+    // },
     // {
     //   id: "dispute",
     //   label: "Dispute Resolution",

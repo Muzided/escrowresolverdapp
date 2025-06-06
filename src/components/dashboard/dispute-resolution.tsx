@@ -14,12 +14,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useFactory } from "@/Hooks/useFactory"
 import { useAppKitAccount } from "@reown/appkit/react"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 import { Switch } from "@/components/ui/switch"
 import { useEscrow } from "@/Hooks/useEscrow"
@@ -29,166 +30,83 @@ import { disputesDemoList } from "../../../public/Data/Ecsrows"
 import { getStatusStyles } from "../../../utils/helper"
 import { useRouter } from "next/navigation"
 import PageHeading from "../ui/pageheading"
+import { Dispute, DisputeResponse } from "@/types/dispute"
+import { getActiveDisputes } from "@/services/Api/dispute/dispute"
+import { handleError } from "../../../utils/errorHandler"
+
 // Mock data for escrow transactions
 
 
 
-type FormattedEscrow = {
-  id: string;
-  amount: string;
-  escrowAddress: string;
-  disputed: boolean;
-  requested: boolean;
-  status: string;
-  receiver: string;
-  reversal: string;
-  createdAt: string;
-};
-// Helper function to format wallet address
-const formatAddress = (address: string) => {
-  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
-}
-
-
-interface EscrowDetails {
-  amount: string;
-  deadline: string;
-}
-type EscrowOverviewProps = {
-  limit?: number
-}
-
 export function DisputeResolution() {
-  const [statusFilter, setStatusFilter] = useState<string>("creator-escrows")
-  const [loadingEscrows] = useState<{ [key: string]: boolean }>({});
-  const [escrows, setEscrows] = useState<any[]>([])
-  const [refresh, setRefresh] = useState(false)
-  const [createdEscrows, setCreatedEscrows] = useState<any[]>([])
-
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
+  const [disputeModalOpen, setDisputeModalOpen] = useState(false)
+  const [disputeReason, setDisputeReason] = useState<string>("")
+  const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({})
+  const [adoptDisputeLoading, setAdoptDisputeLoading] = useState<{ [key: string]: boolean }>({})
+  const { address } = useAppKitAccount();
+  const { fetchDisputeReason, adoptDispute } = useDispute();
+  const queryClient = useQueryClient();
+  const { data: disputedEscrows, isLoading, error } = useQuery<Dispute[]>({
+    queryKey: ['disputed-escrows', address, currentPage, pageSize],
+    queryFn: async () => {
+      const response = await getActiveDisputes(currentPage, pageSize);
+      return response.data.disputes;
+    },
+    enabled: !!address,
+  });
   //next-router
   const router = useRouter()
-
-
-
   const navgateToDetailPage = (id: string) => {
     router.push(`/escrow/${id}`)
   }
 
-  const { fetchCreatorEscrows, fetchReceiverEscrows, fetchPaymentRequest, requestPayment, releaseFunds, approvePayment, initaiteDispute, resolveDispute } = useFactory();
-  const { fetchEscrowDetails } = useEscrow();
-  const { fetchDisputeDetails } = useDispute()
-  const { address } = useAppKitAccount();
 
-  useEffect(() => {
-    if (!address) return;
-    fetchCreatedEscrows(address)
-    fetchClaimAbleEscrows(address)
 
-  }, [address, refresh])
-
-  //user created escrows
-  const fetchCreatedEscrows = async (userAddress: string) => {
+  const handleViewDetails = async (disputeAddress: string, disputeType: string, disputeId: string) => {
     try {
-      const blockchainEscrows = await fetchCreatorEscrows(userAddress)
-      console.log("ecrow-created-by-user", blockchainEscrows)
-      if (!blockchainEscrows || blockchainEscrows.length === 0) {
-        setCreatedEscrows([]);
-        return;
-      }
-
-      const currentDate = new Date().toISOString().split("T")[0];
-
-      // Fetch and format data in one step
-      const formattedEscrows: FormattedEscrow[] = await Promise.all(
-        blockchainEscrows.map(async (escrow: any, index: number) => {
-          const escrowRequest = await fetchPaymentRequest(escrow);
-
-          return {
-            id: `ESC-${(index + 1).toString().padStart(3, "0")}`,
-            amount: `${escrowRequest?.amountRequested} USDT`,
-            escrowAddress: escrow,
-            disputed: escrowRequest?.isDisputed,
-            requested: escrowRequest?.isPayoutRequested,
-            status: escrowRequest?.completed
-              ? "completed"
-              : escrowRequest?.isDisputed
-                ? "disputed"
-                : "active",
-            receiver: userAddress,
-            reversal: `0x${Math.random().toString(16).substr(2, 40)}`,
-            createdAt: currentDate,
-          };
-        })
-      );
-      console.log("formattedEscrows", formattedEscrows)
-
-      setCreatedEscrows(formattedEscrows);
+      setLoadingStates(prev => ({ ...prev, [disputeAddress]: true }))
+      let milestoneIndex: string;
+      disputeType === "milestone" ? milestoneIndex = disputeId : milestoneIndex = '0'
+      const reason = await fetchDisputeReason(disputeAddress, milestoneIndex)
+      setDisputeReason(reason || "No dispute reason found")
+      setDisputeModalOpen(true)
     } catch (error) {
-      console.error("Error fetching escrow payment requests", error);
-      setCreatedEscrows([]); // Ensure state consistency in case of an error
+      console.error("Error fetching dispute reason:", error)
+      handleError(error)
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [disputeAddress]: false }))
     }
-  };
-  //user claimable escrows
-  const fetchClaimAbleEscrows = async (userAddress: string) => {
+  }
+
+  const handleAdoptDispute = async (disputeAddress: string, milestoneIndex: number) => {
     try {
-      const blockchainEscrows = await fetchReceiverEscrows(userAddress);
-
-
-      if (!blockchainEscrows || blockchainEscrows.length === 0) {
-        setEscrows([]);
-        return;
+      setAdoptDisputeLoading(prev => ({ ...prev, [disputeAddress]: true }))
+      const response = await adoptDispute(disputeAddress, milestoneIndex)
+      // If we get a response, it means the adoption was successful
+      if (response.success) {
+        // Invalidate and refetch the disputed escrows query
+        await queryClient.invalidateQueries({ queryKey: ['disputed-escrows'] })
       }
-      console.log("ecrow-received-by-user", blockchainEscrows)
-
-      const currentDate = new Date().toISOString().split("T")[0];
-
-      // Fetch and format data in one step
-      const formattedEscrows: FormattedEscrow[] = await Promise.all(
-        blockchainEscrows.map(async (escrow: any, index: number) => {
-          const escrowRequest = await fetchPaymentRequest(escrow);
-
-
-          return {
-            id: `ESC-${(index + 1).toString().padStart(3, "0")}`,
-            amount: `${escrowRequest?.amountRequested} USDT`,
-            disputed: escrowRequest?.isDisputed,
-            escrowAddress: escrow,
-            requested: escrowRequest?.isPayoutRequested,
-            status: escrowRequest?.completed
-              ? "completed"
-              : escrowRequest?.isDisputed
-                ? "disputed"
-                : "active",
-            receiver: userAddress,
-            reversal: `0x${Math.random().toString(16).substr(2, 40)}`,
-            createdAt: currentDate,
-          };
-        })
-      );
-
-      setEscrows(formattedEscrows);
     } catch (error) {
-      console.error("Error fetching escrow payment requests", error);
-      setEscrows([]); // Ensure state consistency in case of an error
+      console.error("Error adopting dispute:", error)
+      handleError(error)
+    } finally {
+      setAdoptDisputeLoading(prev => ({ ...prev, [disputeAddress]: false }))
     }
-  };
-  const limit = 5;
-
-  // Filter escrows based on status
-  const filteredEscrows = disputesDemoList;
-const description="It is about the quality of the produt it is not up to the mark as promised"
+  }
 
 
 
 
-
-  console.log("filtered-escrows", filteredEscrows)
+  console.log("disputed-escrows", disputedEscrows)
 
 
   return (
     <div className="space-y-4">
-       <PageHeading text="Available Disputes" /> 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <PageHeading text="Available Disputes" />
+      {/* <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <Button
           variant="outline"
           className="flex items-center gap-2 border-zinc-200 bg-white shadow-sm text-zinc-700 
@@ -216,11 +134,9 @@ const description="It is about the quality of the produt it is not up to the mar
             <SelectItem value="claimable-escrows">Resolved Disputes</SelectItem>
           </SelectContent>
         </Select>
-      </div>
-      
+      </div> */}
+
       <Tabs defaultValue="table" className="w-full">
-
-
         <TabsContent value="table" className="mt-0">
           <div className="rounded-md border border-zinc-200 dark:border-zinc-800">
             <Table>
@@ -231,7 +147,8 @@ const description="It is about the quality of the produt it is not up to the mar
                 >
                   <TableHead className="text-zinc-500 dark:text-zinc-400">Dispute Address</TableHead>
                   <TableHead className="text-zinc-500 dark:text-zinc-400">	Escrow Address</TableHead>
-                  <TableHead className="text-zinc-500 dark:text-zinc-400">Reason</TableHead>
+                  {/* <TableHead className="text-zinc-500 dark:text-zinc-400">Reason</TableHead> */}
+                  <TableHead className="text-zinc-500 dark:text-zinc-400">Type</TableHead>
                   <TableHead className="text-zinc-500 dark:text-zinc-400">	Amount</TableHead>
                   <TableHead className="text-zinc-500 dark:text-zinc-400">	Date</TableHead>
                   <TableHead className="text-zinc-500 dark:text-zinc-400">View Details</TableHead>
@@ -239,7 +156,7 @@ const description="It is about the quality of the produt it is not up to the mar
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredEscrows.length === 0 ? (
+                {disputedEscrows?.length === 0 ? (
                   <TableRow
                     className="border-zinc-200 hover:bg-zinc-100/50 
                     dark:border-zinc-800 dark:hover:bg-zinc-800/50"
@@ -249,26 +166,18 @@ const description="It is about the quality of the produt it is not up to the mar
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredEscrows.map((escrow) => (
+                  disputedEscrows?.map((escrow) => (
                     <TableRow
-                      key={escrow.disputeAddress}
+                      key={escrow.dispute_contract_address}
                       className="border-zinc-200 hover:bg-zinc-100/50 
                       dark:border-zinc-800 dark:hover:bg-zinc-800/50"
                     >
                       <TableCell className="font-medium text-zinc-900 dark:text-white">
-                        {escrow.disputeAddress?.slice(0, 8)}...{escrow.disputeAddress?.slice(-7)}
+                        {escrow.dispute_contract_address?.slice(0, 8)}...{escrow.dispute_contract_address?.slice(-7)}
                       </TableCell>
-
-
-
                       <TableCell>
-                        {escrow.escrowAddress?.slice(0, 8)}...{escrow.escrowAddress?.slice(-7)}
-
-                      </TableCell>
-
-
-                        
-                        <TableCell>
+                        {escrow.escrowDetails.escrow_contract_address?.slice(0, 8)}...{escrow.escrowDetails.escrow_contract_address?.slice(-7)} </TableCell>
+                      {/* <TableCell>
                         {escrow.reason.slice(0, 12)}...
                           <Dialog>
                       <DialogTrigger asChild>
@@ -284,48 +193,39 @@ const description="It is about the quality of the produt it is not up to the mar
                           <div>
                             {escrow.reason}
                           </div>
-                        
                         </div>
                       </DialogContent>
                     </Dialog>
-                        </TableCell>
-
+                        </TableCell> */}
                       <TableCell>
-                        
-                          {escrow.amount}
-                       
+                        {escrow.type}
                       </TableCell>
                       <TableCell>
-                        {escrow.date}
+                        {escrow.escrowDetails.amount}
                       </TableCell>
-
-
-
+                      <TableCell>
+                        {escrow.createdAt}
+                      </TableCell>
                       {/* viewEscrow details */}
 
-<div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        // disabled={loadingEscrows[escrow.escrowAddress] || false}
-                        className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
-                        onClick={() => navgateToDetailPage("3f4#fsd4")}
-                      >
-                        View Details
-                      </Button>
-                      <Button
-                        size="sm"
-                        // disabled={loadingEscrows[escrow.escrowAddress] || false}
-                        className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
-                       
-                      >
-                        Adopt Dispute
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
+                          onClick={() => handleViewDetails(escrow.dispute_contract_address, escrow.type, escrow.milestone_id)}
+                          disabled={loadingStates[escrow.dispute_contract_address]}
+                        >
+                          {loadingStates[escrow.dispute_contract_address] ? "Loading..." : "View Details"}
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
+                          onClick={() => handleAdoptDispute(escrow.dispute_contract_address, escrow.milestone_index)}
+                          disabled={adoptDisputeLoading[escrow.dispute_contract_address]}
+                        >
+                          Adopt Dispute
+                        </Button>
                       </div>
-
-
-
-
-
 
                     </TableRow>
                   ))
@@ -335,10 +235,19 @@ const description="It is about the quality of the produt it is not up to the mar
           </div>
         </TabsContent>
 
-
-
-
       </Tabs>
+      <Dialog open={disputeModalOpen} onOpenChange={setDisputeModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Dispute Details</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <p className="text-gray-700 dark:text-gray-300">{disputeReason}</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

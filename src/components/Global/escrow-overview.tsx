@@ -31,28 +31,17 @@ import { useRouter } from "next/navigation"
 import PageHeading from "../ui/pageheading"
 import ChatBox from "../dashboard/ChatBox"
 import DisputeTimingInfo from '@/components/dashboard/dispute-timing-info'
+import { useQuery } from "@tanstack/react-query"
+import { adoptedDispute, AdoptedDisputeResponse } from "@/types/dispute"
+import { getAdoptedDispute } from "@/services/Api/dispute/dispute"
 
-type FormattedEscrow = {
-  id: string;
-  amount: string;
-  escrowAddress: string;
-  disputed: boolean;
-  requested: boolean;
-  status: string;
-  receiver: string;
-  reversal: string;
-  createdAt: string;
-};
+
 // Helper function to format wallet address
 const formatAddress = (address: string) => {
-  return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`
+  return `${address.substring(0, 6)}...${address.substring(address.length - 6)}`
 }
 
 
-interface EscrowDetails {
-  amount: string;
-  deadline: string;
-}
 type EscrowOverviewProps = {
   limit?: number
 }
@@ -61,197 +50,65 @@ export function EscrowOverview({ limit }: EscrowOverviewProps) {
   const [statusFilter, setStatusFilter] = useState<string>("creator-escrows")
   const [loadingEscrows, setLoadingEscrows] = useState<{ [key: string]: boolean }>({});
   const [escrows, setEscrows] = useState<any[]>([])
-  const [loading, setLoading] = useState(false)
   const [chatWith, setChatWith] = useState<string>("creator")
   const [openChatBox, setOpenChatBox] = useState(false)
-  const [escrowDetails, setEscrowDetails] = useState<any>()
   const [refresh, setRefresh] = useState(false)
-  const [openDialog, setOpenDialog] = useState(false);
-  const [createdEscrows, setCreatedEscrows] = useState<any[]>([])
-
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   //next-router
   const router = useRouter()
+  const { address } = useAppKitAccount();
 
+  const { data: adoptedDispute, isLoading, error } = useQuery<adoptedDispute[]>({
+    queryKey: ['adopted-escrows', address, currentPage, pageSize],
+    queryFn: async () => {
+      const response = await getAdoptedDispute(currentPage, pageSize);
+      return response.data.disputes;
+    },
+    enabled: !!address,
+  });
+
+  
 
 
   const navgateToDetailPage = (id: string) => {
     router.push(`/escrow/${id}`)
   }
 
-  const { fetchCreatorEscrows, fetchReceiverEscrows, fetchPaymentRequest, requestPayment, releaseFunds, approvePayment, initaiteDispute, resolveDispute } = useFactory();
-  const { fetchEscrowDetails } = useEscrow();
-  const { fetchDisputeDetails } = useDispute()
-  const { address } = useAppKitAccount();
-
-  useEffect(() => {
-    if (!address) return;
-    fetchCreatedEscrows(address)
-    fetchClaimAbleEscrows(address)
-
-  }, [address, refresh])
-
-  //user created escrows
-  const fetchCreatedEscrows = async (userAddress: string) => {
-    try {
-      const blockchainEscrows = await fetchCreatorEscrows(userAddress)
-      console.log("ecrow-created-by-user", blockchainEscrows)
-      if (!blockchainEscrows || blockchainEscrows.length === 0) {
-        setCreatedEscrows([]);
-        return;
-      }
-
-      const currentDate = new Date().toISOString().split("T")[0];
-
-      // Fetch and format data in one step
-      const formattedEscrows: FormattedEscrow[] = await Promise.all(
-        blockchainEscrows.map(async (escrow: any, index: number) => {
-          const escrowRequest = await fetchPaymentRequest(escrow);
-
-          return {
-            id: `ESC-${(index + 1).toString().padStart(3, "0")}`,
-            amount: `${escrowRequest?.amountRequested} USDT`,
-            escrowAddress: escrow,
-            disputed: escrowRequest?.isDisputed,
-            requested: escrowRequest?.isPayoutRequested,
-            status: escrowRequest?.completed
-              ? "completed"
-              : escrowRequest?.isDisputed
-                ? "disputed"
-                : "active",
-            receiver: userAddress,
-            reversal: `0x${Math.random().toString(16).substr(2, 40)}`,
-            createdAt: currentDate,
-          };
-        })
-      );
-      console.log("formattedEscrows", formattedEscrows)
-
-      setCreatedEscrows(formattedEscrows);
-    } catch (error) {
-      console.error("Error fetching escrow payment requests", error);
-      setCreatedEscrows([]); // Ensure state consistency in case of an error
-    }
-  };
-  //user claimable escrows
-  const fetchClaimAbleEscrows = async (userAddress: string) => {
-    try {
-      const blockchainEscrows = await fetchReceiverEscrows(userAddress);
-
-
-      if (!blockchainEscrows || blockchainEscrows.length === 0) {
-        setEscrows([]);
-        return;
-      }
-      console.log("ecrow-received-by-user", blockchainEscrows)
-
-      const currentDate = new Date().toISOString().split("T")[0];
-
-      // Fetch and format data in one step
-      const formattedEscrows: FormattedEscrow[] = await Promise.all(
-        blockchainEscrows.map(async (escrow: any, index: number) => {
-          const escrowRequest = await fetchPaymentRequest(escrow);
-
-
-          return {
-            id: `ESC-${(index + 1).toString().padStart(3, "0")}`,
-            amount: `${escrowRequest?.amountRequested} USDT`,
-            disputed: escrowRequest?.isDisputed,
-            escrowAddress: escrow,
-            requested: escrowRequest?.isPayoutRequested,
-            status: escrowRequest?.completed
-              ? "completed"
-              : escrowRequest?.isDisputed
-                ? "disputed"
-                : "active",
-            receiver: userAddress,
-            reversal: `0x${Math.random().toString(16).substr(2, 40)}`,
-            createdAt: currentDate,
-          };
-        })
-      );
-
-      setEscrows(formattedEscrows);
-    } catch (error) {
-      console.error("Error fetching escrow payment requests", error);
-      setEscrows([]); // Ensure state consistency in case of an error
-    }
-  };
-
-  // Filter escrows based on status
-  const filteredEscrows =
-    statusFilter === "creator-escrows" ? userEscrows : escrows;
-
-
-
-  console.log("filteredEscrows", filteredEscrows)
-
-
 
   return (
     <div className="space-y-4">
-
-
-      {/* <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <Button
-          variant="outline"
-          className="flex items-center gap-2 border-zinc-200 bg-white shadow-sm text-zinc-700 
-            hover:bg-zinc-50 hover:border-zinc-300 hover:shadow-md transition-all duration-200
-            dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:shadow-none 
-            dark:hover:bg-zinc-700 dark:hover:border-zinc-600 dark:hover:shadow-none"
-        >
-          <Filter className="h-4 w-4" />
-          Filter
-        </Button>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger
-            className="w-full sm:w-[180px] border-zinc-200 bg-white text-zinc-900 
-            dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-          >
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent
-            className="border-zinc-200 bg-white text-zinc-900 
-            dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-          >
-            <SelectItem value="creator-escrows">All Escrows</SelectItem>
-            <SelectItem value="claimable-escrows">Active Escrows</SelectItem>
-            <SelectItem value="claimable-escrows">Disputed Escrows</SelectItem>
-          </SelectContent>
-        </Select>
-      </div> */}
-
-
       {openChatBox ?
-       <ChatBox setOpenChatBox={setOpenChatBox} /> 
-       :
-       <div className="space-y-4">
-         <PageHeading text="Time Details" /> 
-        <DisputeTimingInfo
-                  adoptedAt={"2025-06-29T12:00:00Z"}
-                  disputeId={"sssde"}
-                  status={'active'}
-                />
-       <PageHeading text="Adopted Disputes" />
-      
-       <ActiveDisputeDetails
-        filteredEscrows={filteredEscrows}
-        loadingEscrows={loadingEscrows}
-        setOpenChatBox={setOpenChatBox}
-        navgateToDetailPage={navgateToDetailPage}
-      />
-      </div>}
+        <ChatBox setOpenChatBox={setOpenChatBox} />
+        :
+        <div className="space-y-4">
+          <PageHeading text="Time Details" />
+          <DisputeTimingInfo
+            adoptedAt={"2025-06-29T12:00:00Z"}
+            disputeId={"sssde"}
+            status={'active'}
+          />
+          <PageHeading text="Adopted Disputes" />
+
+          <ActiveDisputeDetails
+            adoptedDispute={adoptedDispute || []}
+            loadingEscrows={loadingEscrows}
+            setOpenChatBox={setOpenChatBox}
+            navgateToDetailPage={navgateToDetailPage}
+          />
+        </div>}
 
     </div>
   )
 }
 type Props = {
-  filteredEscrows: Escrow[];
+  adoptedDispute: adoptedDispute[];
   loadingEscrows: { [key: string]: boolean };
   setOpenChatBox: (val: boolean) => void;
   navgateToDetailPage: (id: string) => void;
 };
 const ActiveDisputeDetails: React.FC<Props> = ({
-  filteredEscrows,
+  adoptedDispute,
   loadingEscrows,
   setOpenChatBox,
   navgateToDetailPage,
@@ -278,7 +135,7 @@ const ActiveDisputeDetails: React.FC<Props> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredEscrows.length === 0 ? (
+          {adoptedDispute.length === 0 ? (
             <TableRow
               className="border-zinc-200 hover:bg-zinc-100/50 
             dark:border-zinc-800 dark:hover:bg-zinc-800/50"
@@ -288,35 +145,35 @@ const ActiveDisputeDetails: React.FC<Props> = ({
               </TableCell>
             </TableRow>
           ) : (
-            filteredEscrows.slice(0, 2).map((escrow) => (
+            adoptedDispute.map((disputedEscrow) => (
               <TableRow
-                key={escrow.escrowId}
+                key={disputedEscrow.dispute_id}
                 className="border-zinc-200 hover:bg-zinc-100/50 
               dark:border-zinc-800 dark:hover:bg-zinc-800/50"
               >
                 <TableCell className="font-medium text-zinc-900 dark:text-white">
-                  {escrow.escrowAddress?.slice(0, 8)}...{escrow.escrowAddress?.slice(-7)}
+                  {formatAddress(disputedEscrow.disputeContractAddress)}
                 </TableCell>
 
                 <TableCell>
-                  {escrow.receiver}
-
-                </TableCell>
-
-                <TableCell>
-                  {escrow.receiver}
+                  {formatAddress(disputedEscrow.escrow.creator_walletaddress)}
 
                 </TableCell>
 
                 <TableCell>
-                  {escrow.amount}
+                  {formatAddress(disputedEscrow.escrow.receiver_walletaddress)}
+
                 </TableCell>
 
                 <TableCell>
-                  {escrow.paymentType}
+                  {disputedEscrow.escrow.amount}
+                </TableCell>
+
+                <TableCell>
+                  {disputedEscrow.escrow.payment_type}
                 </TableCell>
                 <TableCell>
-                  {escrow.jurisdiction}
+                  {disputedEscrow.escrow.jurisdiction_tag}
                 </TableCell>
 
                 <TableCell>
@@ -325,7 +182,7 @@ const ActiveDisputeDetails: React.FC<Props> = ({
                     <DialogTrigger asChild>
                       <Button
                         size="sm"
-                        disabled={loadingEscrows[escrow.escrowAddress] || false}
+                        disabled={loadingEscrows[disputedEscrow.escrow.escrow_contract_address] || false}
                         className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
 
                       >
@@ -360,9 +217,9 @@ const ActiveDisputeDetails: React.FC<Props> = ({
 
                   <Button
                     size="sm"
-                    disabled={loadingEscrows[escrow.escrowAddress] || false}
+                    disabled={loadingEscrows[disputedEscrow.escrow.escrow_contract_address] || false}
                     className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
-                    onClick={() => navgateToDetailPage("3f4#fsd4")}
+                    onClick={() => navgateToDetailPage(disputedEscrow.escrow.escrow_contract_address)}
                   >
                     View Details
                   </Button>

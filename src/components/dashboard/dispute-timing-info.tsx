@@ -1,6 +1,9 @@
 // src/components/dashboard/DisputeTimingInfo.tsx
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Clock, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { useDispute } from '@/Hooks/useDispute';
+import { useAppKitAccount } from '@reown/appkit/react';
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface DisputeTimingInfoProps {
     adoptedAt: string;
@@ -13,6 +16,30 @@ const DisputeTimingInfo: React.FC<DisputeTimingInfoProps> = ({
     disputeId,
     status
 }) => {
+    const { fetchDisputerCoolDown } = useDispute();
+    const { address } = useAppKitAccount();
+    const [cooldownTime, setCooldownTime] = useState<number>(0);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (!address) return;
+        const fetchCooldown = async () => {
+            try {
+                setIsLoading(true);
+                const time = await fetchDisputerCoolDown(address);
+                setCooldownTime(time);
+            } catch (error) {
+                console.error("Error fetching cooldown:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchCooldown();
+        // Set up an interval to update the cooldown time every minute
+        const interval = setInterval(fetchCooldown, 60000);
+        return () => clearInterval(interval);
+    }, [address, fetchDisputerCoolDown]);
+
     const calculateTimeRemaining = (adoptedDate: string) => {
         const adopted = new Date(adoptedDate)
         const now = new Date()
@@ -25,23 +52,19 @@ const DisputeTimingInfo: React.FC<DisputeTimingInfoProps> = ({
         return { days, hours, deadline }
     }
 
-    const calculateCooldown = () => {
-        const now = new Date()
-        const lastAdoption = new Date(adoptedAt)
-        const cooldownEnd = new Date(lastAdoption.getTime() + 24 * 60 * 60 * 1000) // 24 hours cooldown
-        const timeUntilCooldownEnd = cooldownEnd.getTime() - now.getTime()
-
-        const hours = Math.floor(timeUntilCooldownEnd / (60 * 60 * 1000))
-        const minutes = Math.floor((timeUntilCooldownEnd % (60 * 60 * 1000)) / (60 * 1000))
-
-        return { hours, minutes, cooldownEnd }
+    const formatCooldownTime = (seconds: number) => {
+        if (seconds <= 0) return { hours: 0, minutes: 0, isOver: true };
+        
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        return { hours, minutes, isOver: false };
     }
 
     const { days, hours, deadline } = calculateTimeRemaining(adoptedAt)
-    const { hours: cooldownHours, minutes: cooldownMinutes, cooldownEnd } = calculateCooldown()
+    const { hours: cooldownHours, minutes: cooldownMinutes, isOver } = formatCooldownTime(cooldownTime);
 
     return (
-        <div className=" grid grid-cols-1 lg:grid-cols-3  gap-4 ">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Cooldown Period Card */}
             <div className="bg-white w-full dark:bg-zinc-900 rounded-lg shadow p-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -49,22 +72,30 @@ const DisputeTimingInfo: React.FC<DisputeTimingInfoProps> = ({
                     <h3 className="font-semibold text-zinc-900 dark:text-white">Cooldown Period</h3>
                 </div>
                 <div className="space-y-2">
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                        Time until next dispute adoption:
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <span className="text-lg font-medium text-zinc-900 dark:text-white">
-                            {cooldownHours}h {cooldownMinutes}m
-                        </span>
-                        <span className="text-sm text-zinc-500">
-                            (Ends: {cooldownEnd.toLocaleString()})
-                        </span>
-                    </div>
+                    {isLoading ? (
+                        <>
+                            <Skeleton className="h-4 w-[200px]" />
+                            <Skeleton className="h-6 w-[100px]" />
+                        </>
+                    ) : (
+                        <>
+                            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                {isOver ? "You can now adopt a new dispute" : "Time until next dispute adoption:"}
+                            </p>
+                            {!isOver && (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-lg font-medium text-zinc-900 dark:text-white">
+                                        {cooldownHours}h {cooldownMinutes}m
+                                    </span>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
 
             {/* Resolution Timeframe Card */}
-            <div className="bg-white w-full dark:bg-zinc-900 rounded-lg shadow p-4">
+            {/* <div className="bg-white w-full dark:bg-zinc-900 rounded-lg shadow p-4">
                 <div className="flex items-center gap-2 mb-2">
                     {status === 'active' ? (
                         <AlertCircle className="w-5 h-5 text-yellow-500" />
@@ -143,7 +174,7 @@ const DisputeTimingInfo: React.FC<DisputeTimingInfoProps> = ({
                         </p>
                     </div>
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }
