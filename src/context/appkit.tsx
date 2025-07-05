@@ -5,13 +5,13 @@ import { EthersAdapter } from '@reown/appkit-adapter-ethers'
 import { mainnet, arbitrum, sepolia } from '@reown/appkit/networks'
 
 // 1. Get projectId at https://cloud.reown.com
-const projectId = '389afe5ad76ae9f63fb4b84e1212da20'
+const projectId = '59654aa00cd1d9ba41487417f2232a10'
 
 // 2. Create a metadata object
 const metadata = {
-  name: 'multiescrowsig',
+  name: 'resdash',
   description: 'AppKit Example',
-  url: 'https://reown.com/appkit', // origin must match your domain & subdomain
+  url: 'http://localhost:3000/', // origin must match your domain & subdomain
   icons: ['https://assets.reown.com/reown-profile-pic.png']
 }
 

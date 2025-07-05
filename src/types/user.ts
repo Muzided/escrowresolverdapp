@@ -40,8 +40,3 @@ export interface EscrowCreationData {
     }[];
 }
 
-// {
-//     "message": "User not found. Please sign this key to verify and register.",
-//     "toSign": "681de1d3c9bf75ae61b38678",
-//     "requiresRegistration": true
-// }

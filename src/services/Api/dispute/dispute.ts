@@ -1,6 +1,6 @@
 import { EscrowCreationResponse } from "@/types/contract"
 import { axiosService } from "../apiConfig"
-import { AdoptedDisputeResponse, DisputeResponse } from "@/types/dispute"
+import { AdoptedDisputeResponse, DisputeResponse, ResolveDispute } from "@/types/dispute"
 import { toast } from "react-toastify"
 
 
@@ -14,12 +14,13 @@ export const getActiveDisputes = async (page: number = 1, limit: number = 10, st
     }
 }
 
-export const saveadpotedDispute = async (disputeAddress: string) => {
-  
+export const saveadpotedDispute = async (disputeAddress: string, transactionHash: string) => {
+
     try {
-        
+
         const response = await axiosService.post(`api/resolver/adoptDispute`, {
             disputeContractAddress: disputeAddress,
+            txHash: transactionHash
         })
         return response
     } catch (error) {
@@ -28,12 +29,32 @@ export const saveadpotedDispute = async (disputeAddress: string) => {
     }
 }
 
-export const getAdoptedDispute = async (page: number = 1, limit: number = 10, status: string = "all") => {
+export const getAdoptedDispute = async (page: number = 1, limit: number = 10, status: string ) => {
     try {
-        const response = await axiosService.get<AdoptedDisputeResponse>(`api/resolver/myAdoptedDisputes`)
+        const response = await axiosService.get<AdoptedDisputeResponse>(`api/resolver/myAdoptedDisputes?status=${status}`)
         return response
     } catch (error) {
         console.log("error while fetching adopted dispute", error)
+        throw error
+    }
+}
+export const resolvedEscrows = async (page: number = 1, limit: number = 10, status: string ) => {
+    try {
+        const response = await axiosService.get<AdoptedDisputeResponse>(`api/resolver/myAdoptedDisputes?status=${status}`)
+        return response
+    } catch (error) {
+        console.log("error while fetching adopted dispute", error)
+        throw error
+    }
+}
+
+
+export const savedResolvedDispute = async (resolveDisputeData: ResolveDispute) => {
+    try {
+        const response = await axiosService.post(`api/resolver/resolveDispute`, resolveDisputeData)
+        return response
+    } catch (error) {
+        console.log("error while saving resolved dispute", error)
         throw error
     }
 }

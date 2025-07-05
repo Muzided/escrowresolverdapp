@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 export const handleError = (error: any) => {
     // Convert error to string if it's not already
     const errorString = error.toString().toLowerCase();
-    console.log("errorString",errorString)
+    console.log("errorString", errorString)
     // Check for common error patterns in the string
     if (errorString.includes("user rejected") || errorString.includes("user denied")) {
         toast.error("User rejected the request.");
@@ -51,12 +51,12 @@ export function extractErrorMessage(error: AxiosError): string {
 
 
     if (typeof data === 'string') {
-       
+
         return data;
     }
 
     if (typeof data === 'object' && data !== null) {
-       
+
         if ('message' in data) {
             return (data as any).message;
         }
@@ -68,20 +68,23 @@ export function extractErrorMessage(error: AxiosError): string {
 
     return 'An unexpected error occurred';
 }
-export function hadndleApiErrorToast(error: any ): void {
+
+
+export function hadndleApiErrorToast(error: any): void {
     const { message, status, code } = error;
-  
+
     console.error('API Error:', { message, status, code });
-   toast.error(message || 'Something went wrong');
-  }
+    toast.error(message || 'Something went wrong');
+}
+
 export function showApiErrorToast(error: ApiError): void {
     const { message, status, code } = error;
-  
-    console.error('API Error:', { message, status, code });
-  
-    toast.error(message || 'Something went wrong');
-  }
 
-  export function handleApiError(error: any) {
-   toast.error(error.message || 'Something went wrong');
-  }
+    console.error('API Error:', { message, status, code });
+
+    toast.error(message || 'Something went wrong');
+}
+
+export function handleApiError(error: any) {
+    toast.error(error.message || 'Something went wrong');
+}

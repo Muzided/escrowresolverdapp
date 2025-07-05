@@ -42,9 +42,15 @@ export function EscrowMilestoneTracker({ escrowDetails, escrowOnChainDetails, us
   }, []);
 
   const getStatusIcon = (status: string, milestone: ContractMilestone, index: number) => {
-    // If any milestone is disputed, show disputed icon
-    const isAnyMilestoneDisputed = escrowOnChainDetails.some(m => m.disputedRaised);
-    if (isAnyMilestoneDisputed) {
+    // Find the first milestone that was paid (released)
+    const firstPaidMilestoneIndex = escrowOnChainDetails.findIndex(m => m.released);
+    
+    // If any milestone after the first paid milestone is disputed, show disputed icon
+    const isAnyMilestoneAfterFirstPaidDisputed = escrowOnChainDetails
+      .slice(firstPaidMilestoneIndex + 1)
+      .some(m => m.disputedRaised);
+    
+    if (isAnyMilestoneAfterFirstPaidDisputed && index > firstPaidMilestoneIndex) {
       return <AlertCircle className="h-6 w-6 text-red-500 animate-pulse" />
     }
 
@@ -53,8 +59,8 @@ export function EscrowMilestoneTracker({ escrowDetails, escrowOnChainDetails, us
       return <CheckCircle2 className="h-6 w-6 text-green-500" />
     }
 
-    // Check if milestone is in dispute
-    if (milestone.disputedRaised) {
+    // Check if milestone is in dispute (only if it's after the first paid milestone)
+    if (milestone.disputedRaised && index > firstPaidMilestoneIndex) {
       return <AlertCircle className="h-6 w-6 text-red-500 animate-pulse" />
     }
 
@@ -86,10 +92,18 @@ export function EscrowMilestoneTracker({ escrowDetails, escrowOnChainDetails, us
     return <Clock className="h-6 w-6 text-gray-400" />
   }
 
+  console.log("escrow-details",escrowOnChainDetails)
+
   const getStatusBadge = (status: string, milestone: ContractMilestone, index: number) => {
-    // If any milestone is disputed, all milestones should show disputed status
-    const isAnyMilestoneDisputed = escrowOnChainDetails.some(m => m.disputedRaised);
-    if (isAnyMilestoneDisputed) {
+    // Find the first milestone that was paid (released)
+    const firstPaidMilestoneIndex = escrowOnChainDetails.findIndex(m => m.released);
+    
+    // If any milestone after the first paid milestone is disputed, show disputed status for those milestones
+    const isAnyMilestoneAfterFirstPaidDisputed = escrowOnChainDetails
+      .slice(firstPaidMilestoneIndex + 1)
+      .some(m => m.disputedRaised);
+    
+    if (isAnyMilestoneAfterFirstPaidDisputed && index > firstPaidMilestoneIndex) {
       return <Badge variant="destructive">Disputed</Badge>;
     }
 
@@ -98,8 +112,8 @@ export function EscrowMilestoneTracker({ escrowDetails, escrowOnChainDetails, us
       return <Badge variant="default">Completed</Badge>;
     }
 
-    // Check if milestone is in dispute
-    if (milestone.disputedRaised) {
+    // Check if milestone is in dispute (only if it's after the first paid milestone)
+    if (milestone.disputedRaised && index > firstPaidMilestoneIndex) {
       return <Badge variant="destructive">Disputed</Badge>;
     }
 
@@ -132,10 +146,17 @@ export function EscrowMilestoneTracker({ escrowDetails, escrowOnChainDetails, us
     return <Badge variant="secondary">Pending</Badge>;
   }
 
+
   const getEscrowStatusBadge = (status: string) => {
-    // If any milestone is disputed, show disputed status
-    const isAnyMilestoneDisputed = escrowOnChainDetails.some(m => m.disputedRaised);
-    if (isAnyMilestoneDisputed) {
+    // Find the first milestone that was paid (released)
+    const firstPaidMilestoneIndex = escrowOnChainDetails.findIndex(m => m.released);
+    
+    // If any milestone after the first paid milestone is disputed, show disputed status
+    const isAnyMilestoneAfterFirstPaidDisputed = escrowOnChainDetails
+      .slice(firstPaidMilestoneIndex + 1)
+      .some(m => m.disputedRaised);
+    
+    if (isAnyMilestoneAfterFirstPaidDisputed) {
       return <Badge variant="destructive">Disputed</Badge>;
     }
 

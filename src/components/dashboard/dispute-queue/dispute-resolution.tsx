@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Check, Clock, ExternalLink, Filter, MoreHorizontal, X } from "lucide-react"
+import { Check, Clock, ExternalLink, Filter, MoreHorizontal, X, ChevronLeft, ChevronRight } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -25,14 +25,14 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Switch } from "@/components/ui/switch"
 import { useEscrow } from "@/Hooks/useEscrow"
 import { useDispute } from "@/Hooks/useDispute"
-import { Skeleton } from "../ui/skeleton"
-import { disputesDemoList } from "../../../public/Data/Ecsrows"
-import { getStatusStyles } from "../../../utils/helper"
+import { Skeleton } from "../../ui/skeleton"
+import { disputesDemoList } from "../../../../public/Data/Ecsrows"
+import { getStatusStyles } from "../../../../utils/helper"
 import { useRouter } from "next/navigation"
-import PageHeading from "../ui/pageheading"
+import PageHeading from "../../ui/pageheading"
 import { Dispute, DisputeResponse } from "@/types/dispute"
 import { getActiveDisputes } from "@/services/Api/dispute/dispute"
-import { handleError } from "../../../utils/errorHandler"
+import { handleError } from "../../../../utils/errorHandler"
 
 // Mock data for escrow transactions
 
@@ -48,11 +48,11 @@ export function DisputeResolution() {
   const { address } = useAppKitAccount();
   const { fetchDisputeReason, adoptDispute } = useDispute();
   const queryClient = useQueryClient();
-  const { data: disputedEscrows, isLoading, error } = useQuery<Dispute[]>({
+  const { data: disputedEscrows, isLoading, error } = useQuery<DisputeResponse>({
     queryKey: ['disputed-escrows', address, currentPage, pageSize],
     queryFn: async () => {
       const response = await getActiveDisputes(currentPage, pageSize);
-      return response.data.disputes;
+      return response.data;
     },
     enabled: !!address,
   });
@@ -64,12 +64,11 @@ export function DisputeResolution() {
 
 
 
-  const handleViewDetails = async (disputeAddress: string, disputeType: string, disputeId: string) => {
+  const handleViewDetails = async (disputeAddress: string, disputeType: string, disputeId: number) => {
     try {
       setLoadingStates(prev => ({ ...prev, [disputeAddress]: true }))
-      let milestoneIndex: string;
-      disputeType === "milestone" ? milestoneIndex = disputeId : milestoneIndex = '0'
-      const reason = await fetchDisputeReason(disputeAddress, milestoneIndex)
+      
+      const reason = await fetchDisputeReason(disputeAddress, disputeId)
       setDisputeReason(reason || "No dispute reason found")
       setDisputeModalOpen(true)
     } catch (error) {
@@ -98,7 +97,68 @@ export function DisputeResolution() {
   }
 
 
+  const renderPagination = () => {
+    if (!disputedEscrows?.pagination) return null;
+    const { total, page, totalPages } = disputedEscrows.pagination;
 
+    return (
+      <div className="flex items-center justify-between px-2 py-4 flex-wrap gap-2">
+        <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+          <span>Showing</span>
+          <span className="font-medium text-zinc-900 dark:text-white">
+            {(page - 1) * pageSize + 1}
+          </span>
+          <span>to</span>
+          <span className="font-medium text-zinc-900 dark:text-white">
+            {Math.min(page * pageSize, total)}
+          </span>
+          <span>of</span>
+          <span className="font-medium text-zinc-900 dark:text-white">{total}</span>
+          <span>results</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(page - 1)}
+            disabled={page === 1}
+            className="border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 
+              dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            Previous
+          </Button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <Button
+                key={pageNum}
+                variant={pageNum === page ? "default" : "outline"}
+                size="sm"
+                onClick={() => setCurrentPage(pageNum)}
+                className={pageNum === page 
+                  ? "bg-[#BB7333] text-white hover:bg-[#965C29] dark:bg-[#BB7333] dark:text-white dark:hover:bg-[#965C29]"
+                  : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+                }
+              >
+                {pageNum}
+              </Button>
+            ))}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(page + 1)}
+            disabled={page === totalPages}
+            className="border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 
+              dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
+          >
+            Next
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   console.log("disputed-escrows", disputedEscrows)
 
@@ -106,35 +166,7 @@ export function DisputeResolution() {
   return (
     <div className="space-y-4">
       <PageHeading text="Available Disputes" />
-      {/* <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <Button
-          variant="outline"
-          className="flex items-center gap-2 border-zinc-200 bg-white shadow-sm text-zinc-700 
-            hover:bg-zinc-50 hover:border-zinc-300 hover:shadow-md transition-all duration-200
-            dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:shadow-none 
-            dark:hover:bg-zinc-700 dark:hover:border-zinc-600 dark:hover:shadow-none"
-        >
-          <Filter className="h-4 w-4" />
-          Filter
-        </Button>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger
-            className="w-full sm:w-[180px] border-zinc-200 bg-white text-zinc-900 
-            dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-          >
-            <SelectValue placeholder="Filter by status" />
-          </SelectTrigger>
-          <SelectContent
-            className="border-zinc-200 bg-white text-zinc-900 
-            dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-          >
-            <SelectItem value="creator-escrows">All Disputes</SelectItem>
-            <SelectItem value="claimable-escrows">Active Disputes</SelectItem>
-            <SelectItem value="claimable-escrows">Pedning Disputes</SelectItem>
-            <SelectItem value="claimable-escrows">Resolved Disputes</SelectItem>
-          </SelectContent>
-        </Select>
-      </div> */}
+     
 
       <Tabs defaultValue="table" className="w-full">
         <TabsContent value="table" className="mt-0">
@@ -156,7 +188,18 @@ export function DisputeResolution() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {disputedEscrows?.length === 0 ? (
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                      <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                      <TableCell><Skeleton className="h-8 w-32 rounded-md" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : disputedEscrows?.disputes.length === 0 ? (
                   <TableRow
                     className="border-zinc-200 hover:bg-zinc-100/50 
                     dark:border-zinc-800 dark:hover:bg-zinc-800/50"
@@ -166,7 +209,7 @@ export function DisputeResolution() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  disputedEscrows?.map((escrow) => (
+                  disputedEscrows?.disputes?.map((escrow) => (
                     <TableRow
                       key={escrow.dispute_contract_address}
                       className="border-zinc-200 hover:bg-zinc-100/50 
@@ -212,10 +255,10 @@ export function DisputeResolution() {
                         <Button
                           size="sm"
                           className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
-                          onClick={() => handleViewDetails(escrow.dispute_contract_address, escrow.type, escrow.milestone_id)}
+                          onClick={() => handleViewDetails(escrow.dispute_contract_address, escrow.type, escrow.milestone_index)}
                           disabled={loadingStates[escrow.dispute_contract_address]}
                         >
-                          {loadingStates[escrow.dispute_contract_address] ? "Loading..." : "View Details"}
+                          {loadingStates[escrow.dispute_contract_address] ? "Loading..." : "View Reason"}
                         </Button>
                         <Button
                           size="sm"
@@ -233,6 +276,8 @@ export function DisputeResolution() {
               </TableBody>
             </Table>
           </div>
+          {/* Pagination Controls */}
+          {renderPagination()}
         </TabsContent>
 
       </Tabs>

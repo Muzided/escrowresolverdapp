@@ -36,3 +36,14 @@ export const getStatusStyles = (status: string) => {
   }
 }
 
+export const formatCooldownTime = (seconds: number) => {
+  if (seconds <= 0) return { hours: 0, minutes: 0, isOver: true };
+  
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return { hours, minutes, isOver: false };
+}
+
+export const formatAddress = (address: string) => {
+  return `${address.substring(0, 6)}...${address.substring(address.length - 6)}`
+}

@@ -5,15 +5,17 @@ import { Tabs, TabsContent } from "@/components/ui/tabs"
 
 import { Header } from "@/components/layout/header"
 import { Sidebar } from "@/components/layout/sidebar"
-import { OverviewTab } from "@/components/dashboard/overview-tab"
+import { ResolverStats } from "@/components/dashboard/resolver-stats"
 import { TransactionsTab } from "@/components/dashboard/transaction-tab"
 import { CreateTab } from "@/components/dashboard/create-tab"
-import { DisputeResolution } from "@/components/dashboard/dispute-resolution"
-import { Escrows } from "@/components/dashboard/Escrows"
+import { DisputeResolution } from "@/components/dashboard/dispute-queue/dispute-resolution"
 import ConnectPage from "@/components/dashboard/ConnectPage"
 import { useAppKitAccount } from "@reown/appkit/react"
 import DaoTab from "@/components/dashboard/doa-tab"
 import { useUser } from "@/context/userContext"
+import { OngoingDisputes } from "@/components/resolutions/ongoing-disputes"
+
+import ResolvedDisputes from "@/components/resolved-disputes/resolved-disputes"
 
 export default function Dashboard() {
   const [isClient, setIsClient] = useState(false)
@@ -54,27 +56,32 @@ export default function Dashboard() {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* <DashboardHeader activeTab={activeTab} /> */}
 
-            <TabsContent value="overview" className="mt-0">
+            <TabsContent value="profilestats" className="mt-0">
            
-              <OverviewTab />
+              <ResolverStats />
             </TabsContent>
 
-            <TabsContent value="escrows" className="mt-0">
-             <Escrows/>
+            <TabsContent value="ongoing-disputes" className="mt-0">
+            <OngoingDisputes/>
             </TabsContent>
 
+            
+            <TabsContent value="resolved-disputes" className="mt-0">
+           <ResolvedDisputes/>
+            </TabsContent>
+{/* 
             <TabsContent value="create" className="mt-0">
               <CreateTab />
-            </TabsContent>
+            </TabsContent> */}
             <TabsContent value="dispute" className="mt-0">
              <DisputeResolution/>
             </TabsContent>
-            <TabsContent value="history" className="mt-0">
+            {/* <TabsContent value="history" className="mt-0">
             <TransactionsTab />
-            </TabsContent>
-            <TabsContent value="history" className="mt-0">
+            </TabsContent> */}
+            {/* <TabsContent value="history" className="mt-0">
            <DaoTab/>
-            </TabsContent>
+            </TabsContent> */}
           </Tabs>
           }
         </main>

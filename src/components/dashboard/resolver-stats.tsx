@@ -1,5 +1,4 @@
 import { StatsCard } from "@/components/dashboard/stats-card"
-import { EscrowOverview } from "@/components/Global/escrow-overview"
 import { useWeb3 } from "@/context/Web3Context"
 import { useFactory } from "@/Hooks/useFactory"
 import { useEffect, useState } from "react"
@@ -15,6 +14,10 @@ import {
   Tooltip,
   Legend
 } from 'chart.js'
+import { useQuery } from "@tanstack/react-query"
+import { getResolverStats } from "@/services/Api/resolver/resolver"
+import { resolverStats } from "@/types/resolver"
+import { useAppKitAccount } from "@reown/appkit/react"
 
 // Register ChartJS components
 ChartJS.register(
@@ -27,27 +30,19 @@ ChartJS.register(
   Legend
 )
 
-export function OverviewTab() {
-  const { signer } = useWeb3()
-  const { fetchTotalEscrows, fetchTotalPayments } = useFactory()
+export function ResolverStats() {
   const [totalEscrows, setTotalEscrows] = useState<number>(0)
   const [totalPayments, setTotalPayments] = useState<string>("0")
-
-  useEffect(() => {
-    if (!signer) return
-    fetchNumberOfEscrows()
-    totalPaymentsMade()
-  }, [signer])
-
-  const fetchNumberOfEscrows = async () => {
-    const res = await fetchTotalEscrows()
-    setTotalEscrows(res)
-  }
-
-  const totalPaymentsMade = async () => {
-    const res = await fetchTotalPayments()
-    setTotalPayments(res)
-  }
+  const {address}=  useAppKitAccount();
+  const { data: profileStats, isLoading, error } = useQuery<resolverStats>({
+    queryKey: ['profile-stats'],
+    queryFn: async () => {
+      const response = await getResolverStats();
+      return response.data;
+    },
+    enabled: !!address,
+  });
+ console.log("profile-stats",profileStats)
 
   // Chart configuration
   const chartData = {
@@ -83,12 +78,12 @@ export function OverviewTab() {
         <StatsCard 
           title="Total Disputes Resolved" 
           description="Successfully resolved disputes" 
-          value={disputeStats.totalResolved} 
+          value={profileStats?.stats.resolved.toString()} 
         />
         <StatsCard 
-          title="Daily Adopted Disputes" 
-          description={`${disputeStats.dailyAdopted}/${disputeStats.maxDailyLimit} adopted today`} 
-          value={`${disputeStats.dailyAdopted}/${disputeStats.maxDailyLimit}`} 
+          title=" Adopted Disputes" 
+          description={`${profileStats?.stats.ongoing}/${disputeStats.maxDailyLimit} adopted `} 
+          value={`${profileStats?.stats.ongoing}/${2}`} 
         />
       </div>
 
@@ -110,7 +105,7 @@ export function OverviewTab() {
       </div>
 
       {/* Active Disputes Section */}
-      <div className="bg-zinc-50 shadow-sm dark:bg-zinc-900 p-6 rounded-lg ">
+      {/* <div className="bg-zinc-50 shadow-sm dark:bg-zinc-900 p-6 rounded-lg ">
         <h2 className="text-xl font-semibold mb-4 text-zinc-900 dark:text-white">
           Active Adopted Disputes
         </h2>
@@ -147,7 +142,7 @@ export function OverviewTab() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
     </div>
   )

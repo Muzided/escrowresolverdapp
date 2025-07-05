@@ -34,6 +34,7 @@ export interface Dispute {
 export interface DisputeResponse {
   success: boolean;
   disputes: Dispute[];
+  pagination: Pagination
 }
 
 export interface AdoptDisputeResponse {
@@ -47,17 +48,27 @@ export interface AdoptedDisputeResponse {
 }
 
 export interface adoptedDispute {
-    dispute_id: string,
-    disputeContractAddress: string,
-    status: string,
-    type: string,
-    escrow:AdoptedEscrow
+  dispute_id: string,
+  disputeContractAddress: string,
+  creator_conversation_id: string | null,
+  receiver_conversation_id: string | null,
+  status: string,
+  type: string,
+  escrow: AdoptedEscrow,
+  milestone_index: number
 }
 export interface AdoptedEscrow {
-    escrow_contract_address: string,
-    creator_walletaddress:string,
-    amount: number,
-    receiver_walletaddress:string,
-    payment_type: string,
-    jurisdiction_tag: string,
+  escrow_contract_address: string,
+  creator_walletaddress: string,
+  amount: number,
+  receiver_walletaddress: string,
+  payment_type: string,
+  jurisdiction_tag: string,
+}
+
+export interface ResolveDispute {
+  disputeContractAddress: string,
+  continueWork: boolean,
+  txHash: string,
+  resolvedInFavorOf: string
 }

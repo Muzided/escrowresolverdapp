@@ -1,16 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Tabs, TabsContent } from "@/components/ui/tabs"
-
-import { Header } from "@/components/layout/header"
-import { Sidebar } from "@/components/layout/sidebar"
-import { DashboardHeader } from "@/components/dashboard/dashboard-header"
-import { OverviewTab } from "@/components/dashboard/overview-tab"
-import { TransactionsTab } from "@/components/dashboard/transaction-tab"
-import { CreateTab } from "@/components/dashboard/create-tab"
-import { DisputeResolution } from "@/components/dashboard/dispute-resolution"
-import { Escrows } from "@/components/dashboard/Escrows"
 
 export default function Dashboard() {
   const [isClient, setIsClient] = useState(false)

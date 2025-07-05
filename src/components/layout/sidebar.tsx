@@ -23,26 +23,23 @@ export function Sidebar({ activeTab, setActiveTab, isMobileNavOpen }: SidebarPro
       icon: BadgeAlert,
     },
     {
-      id: "escrows",
+      id: "ongoing-disputes",
       label: "Ongoing Resolutions",
       icon: CreditCard,
     },
-    // {
-    //   id: "create",
-    //   label: "Create Escrow",
-    //   icon: Plus,
-    // },
+    {
+      id: "resolved-disputes",
+      label: "Resolved Disputes",
+      icon: CreditCard,
+    },
    
-    // {
-    //   id: "history",
-    //   label: "History",
-    //   icon: ReceiptText,
-    // },
-    // {
-    //   id: "overview",
-    //   label: "Profile Stats",
-    //   icon: LayoutDashboard,
-    // },
+     {
+      id: "profilestats",
+      label: "Profile Stats",
+      icon: LayoutDashboard,
+    },
+
+   
     // {
     //   id: "dispute",
     //   label: "Dispute Resolution",

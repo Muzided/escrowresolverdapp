@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 interface StatsCardProps {
   title: string
   description: string
-  value: string | number
+  value: string|undefined
 }
 
 export function StatsCard({ title, description, value }: StatsCardProps) {

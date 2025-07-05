@@ -19,7 +19,7 @@ export const RegisterUser = async (wallet_address: string) => {
 
 export const AuthenticatieUser = async (wallet_address: string, signature: string) => {
     try {
-        const response = await axiosService.post<LoginResponse>('/api/auth/authenticate', {
+        const response = await axiosService.post<LoginResponse>('/api/auth/authenticateResolver', {
             wallet_address,
             signature
         })

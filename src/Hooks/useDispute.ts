@@ -6,15 +6,16 @@ import { toast } from "react-toastify";
 import EscrowAbi from "../Web3/Abis/EscrowAbi.json";
 import disputeContractAbi from "../Web3/Abis/disputeContractAbi.json";
 import { convertUnixToDate } from "../../utils/helper";
-import { saveadpotedDispute } from "@/services/Api/dispute/dispute";
-import { AdoptDisputeResponse } from "@/types/dispute";
+import { saveadpotedDispute, savedResolvedDispute } from "@/services/Api/dispute/dispute";
+import { AdoptDisputeResponse, ResolveDispute } from "@/types/dispute";
 import { useEscrow } from "./useEscrow";
+import { isGeneratorFunction } from "util/types";
 
 
 
 export const useDispute = () => {
     const { signer } = useWeb3();
-    const {fetchEscrowContract} = useEscrow();
+    const { fetchEscrowContract } = useEscrow();
     const { multisigFactoryContract } = useWeb3();
     //initialize escrow contract
     const fetchDisputeContract = async (escrowAddress: string) => {
@@ -27,14 +28,14 @@ export const useDispute = () => {
 
     }
 
-   
 
-    const fetchDisputeReason = async (disputeAddress: string, milestoneIndex: string)=> {
+
+    const fetchDisputeReason = async (disputeAddress: string, milestoneIndex: number) => {
         try {
             const contract = await fetchDisputeContract(disputeAddress);
             if (!contract) return;
-            const disputeData = await contract.disputes("0");
-            console.log("disputeData", disputeData)
+            const disputeData = await contract.disputes(milestoneIndex);
+            console.log("disputeDat--yoo", disputeData, milestoneIndex)
             return disputeData.reason;
         } catch (error) {
             console.error("Error fetching dispute reason:", error);
@@ -42,7 +43,7 @@ export const useDispute = () => {
     }
 
     const adoptDispute = async (disputeAddress: string, milestoneIndex: number):
-    Promise<AdoptDisputeResponse>  => {
+        Promise<AdoptDisputeResponse> => {
         let id: any;
         try {
             id = toast.loading(`Adopting dispute...`);
@@ -62,10 +63,10 @@ export const useDispute = () => {
             const adopted = await contract.becomeResolver(milestoneIndex);
             const tx = await adopted.wait();
             console.log("tx-save-dispute", tx)
-            const response = await saveadpotedDispute(disputeAddress);
+            const response = await saveadpotedDispute(disputeAddress, tx.hash);
             console.log("response", response)
             if (response.status === 200) {
-                toast.update(id, { render: `Requested payment hash: ${tx.hash}`, type: "success", isLoading: false, autoClose: 3000 });
+                toast.update(id, { render: `Adopted dispute hash: ${tx.hash}`, type: "success", isLoading: false, autoClose: 3000 });
                 return {
                     success: true,
                     message: "Dispute adopted successfully"
@@ -78,17 +79,17 @@ export const useDispute = () => {
                 };
             }
 
-        } catch (error:any) {
-            
+        } catch (error: any) {
+
             const errorString = error.toString().toLowerCase();
             console.error("Error adopting dispute:", errorString);
             if (errorString.includes("resolver has hit their throughput limit")) {
                 toast.update(id, { render: "You have hit your adoption limit.", type: "error", isLoading: false, autoClose: 3000 });
-            }else{
+            } else {
                 toast.update(id, { render: "Error occurred while adopting dispute", type: "error", isLoading: false, autoClose: 3000 });
             }
-            
-           
+
+
             return {
                 success: false,
                 message: "Error occurred while adopting dispute"
@@ -128,20 +129,20 @@ export const useDispute = () => {
     //fetch disputer cool downtime
     const fetchDisputerCoolDown = async (userAddress: string) => {
         try {
-          
+
             if (!multisigFactoryContract) return 0;
             const timeStart = await multisigFactoryContract.windowStart(userAddress);
             const timeFrame = await multisigFactoryContract.resolutionWindow();
-            
+
             // Calculate end time by adding timeFrame to timeStart
             const endTime = Number(timeStart) + Number(timeFrame);
-            
+
             // Get current time in seconds
             const currentTime = Math.floor(Date.now() / 1000);
-            
+
             // Calculate remaining cooldown time
             const remainingTime = endTime - currentTime;
-            
+
             // Return 0 if time has expired, otherwise return remaining time
             return remainingTime > 0 ? remainingTime : 0;
         } catch (error) {
@@ -150,10 +151,69 @@ export const useDispute = () => {
         }
     }
 
+    const resolveDispute = async (disputeAddress: string, milestoneIndex: number, continueWork: boolean, resolvedInFavorOf: boolean, winnerAddress: string) => {
+        let id: any;
+        try {
+
+            console.log(disputeAddress, milestoneIndex, continueWork, resolvedInFavorOf)
+
+            id = toast.loading(`Resolving dispute...`);
+            const contract = await fetchDisputeContract(disputeAddress);
+
+            if (!contract) {
+                toast.update(id, {
+                    render: "Error while resolving dispute contract",
+                    type: "error",
+                    isLoading: false,
+                    autoClose: 3000
+                });
+                return {
+                    success: false,
+                    message: "Dispute resolved successfully"
+                };;
+            }
+
+            const resolve = await contract.resolveDispute(milestoneIndex, resolvedInFavorOf, continueWork);
+            const tx = await resolve.wait();
+            console.log("tx-resolve-dispute", tx)
+            const disputeData: ResolveDispute = {
+                disputeContractAddress: disputeAddress,
+                continueWork: continueWork,
+                txHash: tx.hash,
+                resolvedInFavorOf: winnerAddress
+            }
+
+            const response = await savedResolvedDispute(disputeData);
+            console.log("response", response)
+            if (response.status === 200) {
+                toast.update(id, { render: `resoved dispute hash: ${tx.hash}`, type: "success", isLoading: false, autoClose: 3000 });
+                return {
+                    success: true,
+                    message: "Dispute resolved successfully"
+                };
+            } else {
+                toast.update(id, { render: "Error occurred while resolving dispute", type: "error", isLoading: false, autoClose: 3000 });
+                return {
+                    success: false,
+                    message: "Error occurred while resolving dispute"
+                };
+            }
+
+        } catch (error) {
+            console.error("Error resolving dispute:", error);
+            toast.update(id, { render: "Error occurred while resolving dispute", type: "error", isLoading: false, autoClose: 3000 });
+            return {
+                success: false,
+                message: "Error occurred while resolving dispute"
+            };
+        }
+    }
+
     return {
         fetchDisputeDetails,
         fetchDisputeReason,
         adoptDispute,
-        fetchDisputerCoolDown
+        fetchDisputerCoolDown,
+        resolveDispute
     }
 }
