@@ -72,3 +72,27 @@ export interface ResolveDispute {
   txHash: string,
   resolvedInFavorOf: string
 }
+
+export interface DisputeTimingState {
+  dispute_contract_address: string;
+  initial_remaining_seconds: number;
+  grace_remaining_seconds: number;
+  final_remaining_seconds: number;
+  grace_period_active: boolean;
+  extended: boolean;
+}
+
+export interface CooldownState {
+  hours: number;
+  minutes: number;
+  isOver: boolean;
+}
+
+export type DisputePhase = 'initial' | 'grace' | 'extended';
+
+// src/constants/dispute.ts
+export const DISPUTE_CONSTANTS = {
+  INITIAL_PERIOD_SECONDS: 5 * 24 * 60 * 60, // 5 days
+  COOLDOWN_REFRESH_INTERVAL: 60000, // 1 minute
+  QUERY_STALE_TIME: 30000, // 30 seconds
+} as const;

@@ -62,14 +62,14 @@ const dummyChatData = {
   ]
 }
 type Props = {
-    setOpenChatBox: (val: boolean) => void;
-    conversationType: ConversationType;
-    conversationId: string|null;
-    setConversationType: (val: ConversationType) => void;
-    setConversationId: (val: string|null) => void;
-  };
-const ChatBox:React.FC<Props>  = ({setOpenChatBox,conversationType,conversationId,setConversationType,setConversationId}) => {
-  
+  setOpenChatBox: (val: boolean) => void;
+  conversationType: ConversationType;
+  conversationId: string | null;
+  setConversationType: (val: ConversationType) => void;
+  setConversationId: (val: string | null) => void;
+};
+const ChatBox: React.FC<Props> = ({ setOpenChatBox, conversationType, conversationId, setConversationType, setConversationId }) => {
+
   const [loading, setLoading] = useState(true)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [isInitialized, setIsInitialized] = useState(false)
@@ -79,7 +79,7 @@ const ChatBox:React.FC<Props>  = ({setOpenChatBox,conversationType,conversationI
     limit: 0,
     totalPages: 0
   })
-  const {user} = useUser()
+  const { user } = useUser()
 
   useEffect(() => {
     const initializeConversation = async () => {
@@ -117,8 +117,8 @@ const ChatBox:React.FC<Props>  = ({setOpenChatBox,conversationType,conversationI
     }
   }
 
-  
-console.log("user",user)
+
+  console.log("user", user)
   const goBack = () => {
     setOpenChatBox(false)
     setLoading(true)
@@ -156,15 +156,15 @@ console.log("user",user)
     <div className="flex flex-col  p-6 bg-white dark:bg-zinc-900 rounded-lg shadow">
       {/* Header with participant info */}
       <div className="p-2 border-b border-zinc-200 dark:border-zinc-700">
-       
-        <div 
-        onClick={goBack}
-        className="text-lg cursor-pointer font-semibold text-zinc-900 dark:text-white flex items-center gap-2 "> <ChevronLeft className="w-4 h-4" /> Back</div>
+
+        <div
+          onClick={goBack}
+          className="text-lg cursor-pointer font-semibold text-zinc-900 dark:text-white flex items-center gap-2 "> <ChevronLeft className="w-4 h-4" /> Back</div>
         <div className="flex gap-4 mt-2 text-sm text-zinc-600 dark:text-zinc-400">
           <div>
             <span className="font-medium">Creator:</span> {dummyChatData.participants.creator}
           </div>
-         
+
         </div>
       </div>
 
@@ -179,17 +179,17 @@ console.log("user",user)
         <TabsContent value="chat" className="flex-1 flex flex-col h-[450px]">
           {/* Messages */}
           <ChatTab
-          messages={messages}
-          messagePagination={messagePagination}
-          conversationId={conversationId || ""}
-          senderId={user?.id || ""}
-           onLoadMore={handleLoadMoreMessages}
+            messages={messages}
+            messagePagination={messagePagination}
+            conversationId={conversationId || ""}
+            senderId={user?.id || ""}
+            onLoadMore={handleLoadMoreMessages}
           />
         </TabsContent>
 
         {/* Media Tab */}
         <TabsContent value="media" >
-          <MediaTab conversationId={conversationId || ""}/>
+          <MediaTab conversationId={conversationId || ""} />
         </TabsContent>
       </Tabs>
     </div>
@@ -199,25 +199,25 @@ console.log("user",user)
 export default ChatBox
 
 interface ChatTabProps {
-  messages:ChatMessage[];
-  messagePagination:ChatPagination;
+  messages: ChatMessage[];
+  messagePagination: ChatPagination;
   conversationId: string;
   senderId: string;
   onLoadMore: (conversationId: string, page: number) => Promise<boolean>
 }
 
 // Separate Message List Component
-const MessageList = React.memo(({ messages, senderId ,isLoadingMore,messagePagination,onLoadMore}: { messages: ChatMessage[], senderId: string ,isLoadingMore: boolean,messagePagination:ChatPagination, onLoadMore: (pagination:number) => Promise<void>,}) => {
+const MessageList = React.memo(({ messages, senderId, isLoadingMore, messagePagination, onLoadMore }: { messages: ChatMessage[], senderId: string, isLoadingMore: boolean, messagePagination: ChatPagination, onLoadMore: (pagination: number) => Promise<void>, }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const [prevScrollHeight, setPrevScrollHeight] = useState(0)
   const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true)
- // Sort messages by sentAt timestamp
- const sortedMessages = useMemo(() => {
-  return [...messages].sort((a, b) =>
-    new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
-  );
-}, [messages]);
+  // Sort messages by sentAt timestamp
+  const sortedMessages = useMemo(() => {
+    return [...messages].sort((a, b) =>
+      new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
+    );
+  }, [messages]);
   useEffect(() => {
     if (shouldScrollToBottom && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -263,9 +263,9 @@ const MessageList = React.memo(({ messages, senderId ,isLoadingMore,messagePagin
         setPrevScrollHeight(0); // Reset on error
       }
     }
-  }, [  isLoadingMore, onLoadMore, messagePagination]);
-   // Add scroll event listener with throttling
-   useEffect(() => {
+  }, [isLoadingMore, onLoadMore, messagePagination]);
+  // Add scroll event listener with throttling
+  useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
 
@@ -288,7 +288,7 @@ const MessageList = React.memo(({ messages, senderId ,isLoadingMore,messagePagin
       </div>
     );
   }
-console.log("sorted-messages",sortedMessages)
+  console.log("sorted-messages", sortedMessages)
   return (
     <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
       {isLoadingMore && (
@@ -311,74 +311,74 @@ console.log("sorted-messages",sortedMessages)
         <div className="flex items-center justify-center h-full text-zinc-500">
           No messages yet. Start the conversation!
         </div>
-      ) 
-      :
-      (
-        sortedMessages.map((msg) => (
-          <div
-            key={msg.message_id}
-            className={`flex ${msg.sender._id === senderId
-              ? "justify-end"
-              : "justify-start"
-              }`}
-          >
+      )
+        :
+        (
+          sortedMessages.map((msg) => (
             <div
-              className={`max-w-[70%] rounded-lg p-3 ${msg.sender._id === senderId
-                ? "bg-blue-500 text-white"
-                : "bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-white"
+              key={msg.message_id}
+              className={`flex ${msg.sender._id === senderId
+                ? "justify-end"
+                : "justify-start"
                 }`}
             >
-              {/* Show message content only if it's not empty */}
-              {msg.content && msg.content.trim() !== "" && (
-                <p>{msg.content}</p>
-              )}
-              
-              {/* Show media if it exists */}
-              {msg.media?.url && (
-                <div className="mt-2">
-                  {/* Show image preview for image types */}
-                  
-                  {msg.media?.type==='image' ? (
-                    <div className="mb-2">
-                      <img 
-                        src={`https://escrow.ipcre8.com${msg?.media?.url}`}
-                        alt={msg.media.originalName || 'Image'}
-                        className="max-w-full sm:max-w-xs md:max-w-sm lg:max-w-md rounded-lg cursor-pointer hover:opacity-90 transition-opacity object-cover"
-                        onClick={() => window.open(`https://escrow.ipcre8.com${msg?.media?.url}`, '_blank')}
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-zinc-600 rounded-lg">
-                      <Paperclip className="w-4 h-4 text-gray-500" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
-                          {msg.media.originalName || 'File'}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {msg.media.type || 'File'}
-                        </p>
+              <div
+                className={`max-w-[70%] rounded-lg p-3 ${msg.sender._id === senderId
+                  ? "bg-blue-500 text-white"
+                  : "bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-white"
+                  }`}
+              >
+                {/* Show message content only if it's not empty */}
+                {msg.content && msg.content.trim() !== "" && (
+                  <p>{msg.content}</p>
+                )}
+
+                {/* Show media if it exists */}
+                {msg.media?.url && (
+                  <div className="mt-2">
+                    {/* Show image preview for image types */}
+
+                    {msg.media?.type === 'image' ? (
+                      <div className="mb-2">
+                        <img
+                          src={`http://localhost:5000${msg?.media?.url}`}
+                          alt={msg.media.originalName || 'Image'}
+                          className="max-w-full sm:max-w-xs md:max-w-sm lg:max-w-md rounded-lg cursor-pointer hover:opacity-90 transition-opacity object-cover"
+                          onClick={() => window.open(`http://localhost:5000${msg?.media?.url}`, '_blank')}
+                        />
                       </div>
-                      <a 
-                        href={`https://escrow.ipcre8.com${msg.media.url}`} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:text-blue-600 text-sm"
-                        download={msg.media.type !== 'application/pdf'}
-                      >
-                        {msg.media.type === 'application/pdf' ? 'View' : 'Download'}
-                      </a>
-                    </div>
-                  )}
-                </div>
-              )}
-              
-              <span className="text-xs opacity-70 mt-1 block">
-                {msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString() : ''}
-              </span>
+                    ) : (
+                      <div className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-zinc-600 rounded-lg">
+                        <Paperclip className="w-4 h-4 text-gray-500" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {msg.media.originalName || 'File'}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {msg.media.type || 'File'}
+                          </p>
+                        </div>
+                        <a
+                          href={`http://localhost:5000${msg.media.url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 hover:text-blue-600 text-sm"
+                          download={msg.media.type !== 'application/pdf'}
+                        >
+                          {msg.media.type === 'application/pdf' ? 'View' : 'Download'}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <span className="text-xs opacity-70 mt-1 block">
+                  {msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString() : ''}
+                </span>
+              </div>
             </div>
-          </div>
-        ))
-      )}
+          ))
+        )}
       <div ref={messagesEndRef} />
     </div>
   );
@@ -387,12 +387,12 @@ console.log("sorted-messages",sortedMessages)
 MessageList.displayName = 'MessageList';
 
 // Separate Message Input Component
-const MessageInput = React.memo(({ 
-  onSendMessage, 
-  isConnected 
-}: { 
-  onSendMessage: (message: string) => void, 
-  isConnected: boolean 
+const MessageInput = React.memo(({
+  onSendMessage,
+  isConnected
+}: {
+  onSendMessage: (message: string) => void,
+  isConnected: boolean
 }) => {
   const [message, setMessage] = useState("");
 
@@ -436,7 +436,7 @@ const MessageInput = React.memo(({
             <Paperclip className="w-4 h-4" />
           </Button>
         </label>
-        <Button 
+        <Button
           onClick={handleSend}
           disabled={!isConnected || !message.trim()}
         >
@@ -449,12 +449,13 @@ const MessageInput = React.memo(({
 
 MessageInput.displayName = 'MessageInput';
 
-const ChatTab: React.FC<ChatTabProps> = ({messages,messagePagination,onLoadMore, conversationId, senderId }) => {
+const ChatTab: React.FC<ChatTabProps> = ({ messages, messagePagination, onLoadMore, conversationId, senderId }) => {
   const [message, setMessage] = useState("")
   const [allMessages, setAllMessages] = useState<ChatMessage[]>([])
   const [isLoadingMore, setIsLoadingMore] = useState(false)
-   const [media,setMedia] = useState<Media| null>(null)
+  const [media, setMedia] = useState<Media | null>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+
   const handleMessageReceived = useCallback((message: ChatMessage) => {
 
     // Add the new message to allMessages array, avoiding duplicates
@@ -464,92 +465,94 @@ const ChatTab: React.FC<ChatTabProps> = ({messages,messagePagination,onLoadMore,
       return [...prev, message]
     })
   }, [])
-  const { 
-    sendMessage: socketSendMessage, 
-    isConnected, 
-    error: socketError 
+
+  const {
+    sendMessage: socketSendMessage,
+    isConnected,
+    error: socketError
   } = useSocketChat({
     conversationId: conversationId,
     senderId: senderId,
-    onMessageReceived:handleMessageReceived,
+    onMessageReceived: handleMessageReceived,
   });
- 
-useEffect(()=>{
-  if (messages.length > 0) {
-    setAllMessages(messages)
-  }
-},[messages])
 
-const handleSendMessage = () => {
-  if ((!message.trim() && !media) || !conversationId) return;
-  
-  // Send message with media if available
-  if (media && message) {
-    console.log("media-being-sent",media)
-    // You can modify this to send both text and media
-    socketSendMessage(message,media);
-    // socketSendMessage(message, media) // If your socket supports media
-  } else if(media && !message) {
-    console.log("message", message)
-    socketSendMessage('',media);
-  }else if (message && !media){
-    socketSendMessage(message,null);
-  }
-  
-  setMessage("");
-  setMedia(null); // Clear media after sending
-}
+  useEffect(() => {
+    if (messages.length > 0) {
+      setAllMessages(messages)
+    }
+  }, [messages])
 
-const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0]
-  if (file && conversationId) {
-    try {
-      console.log("File uploaded:", file)
-      const response = await uploadMediatoChat(file)
-      console.log("response", response)
-      if (response.status === 200) {
-        setMedia(response.data.media)
-        toast.success("File uploaded successfully")
-      } else {
+  const handleSendMessage = () => {
+    if ((!message.trim() && !media) || !conversationId) return;
+
+    // Send message with media if available
+    if (media && message) {
+      console.log("media-being-sent", media)
+      // You can modify this to send both text and media
+      socketSendMessage(message, media);
+      // socketSendMessage(message, media) // If your socket supports media
+    } else if (media && !message) {
+      console.log("message", message)
+      socketSendMessage('', media);
+    } else if (message && !media) {
+      socketSendMessage(message, null);
+    }
+
+    setMessage("");
+    setMedia(null); // Clear media after sending
+  }
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file && conversationId) {
+      try {
+        console.log("File uploaded:", file)
+        const response = await uploadMediatoChat(file)
+        console.log("response", response)
+        if (response.status === 200) {
+          setMedia(response.data.media)
+          toast.success("File uploaded successfully")
+        } else {
+          toast.error("Failed to upload file")
+        }
+      } catch (error) {
+        console.error("Error uploading file:", error)
         toast.error("Failed to upload file")
       }
-    } catch (error) {
-      console.error("Error uploading file:", error)
-      toast.error("Failed to upload file")
     }
+    // Reset the input
+    event.target.value = ''
   }
-  // Reset the input
-  event.target.value = ''
-}
 
-const handleRemoveMedia = () => {
-  setMedia(null)
-}
-const handleScroll = async (pagination: number) => {
-  console.log("message-pagination", messagePagination, pagination)
-  if (messagePagination.page >= messagePagination.totalPages) {
-    setIsLoadingMore(false);
-    return;
+  const handleRemoveMedia = () => {
+    setMedia(null)
   }
   
-  setIsLoadingMore(true);
-  try {
-    await onLoadMore(conversationId, pagination);
-  } catch (error) {
-    console.error('Error loading more messages:', error);
-  } finally {
-    setIsLoadingMore(false);
+  const handleScroll = async (pagination: number) => {
+    console.log("message-pagination", messagePagination, pagination)
+    if (messagePagination.page >= messagePagination.totalPages) {
+      setIsLoadingMore(false);
+      return;
+    }
+
+    setIsLoadingMore(true);
+    try {
+      await onLoadMore(conversationId, pagination);
+    } catch (error) {
+      console.error('Error loading more messages:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
   }
-}
   return (
     <div className="flex flex-col   h-[450px]">
       <MessageList
-       messages={allMessages}
+        messages={allMessages}
         senderId={senderId}
         isLoadingMore={isLoadingMore}
         onLoadMore={handleScroll}
         messagePagination={messagePagination}
-         />
+      />
       {/* <MessageInput onSendMessage={handleSendMessage} isConnected={isConnected} /> */}
       <div className="p-4 border-t border-zinc-200 dark:border-zinc-700">
         {/* Media Preview */}
@@ -580,7 +583,7 @@ const handleScroll = async (pagination: number) => {
             </div>
           </div>
         )}
-        
+
         <div className="flex gap-2">
           <Input
             type="text"
@@ -621,8 +624,8 @@ const handleScroll = async (pagination: number) => {
     </div>
   );
 };
-interface MediaProps{
-  conversationId:string
+interface MediaProps {
+  conversationId: string
 }
 const MediaTab = ({ conversationId }: MediaProps) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -685,11 +688,10 @@ const MediaTab = ({ conversationId }: MediaProps) => {
           return (
             <div
               key={data.message_id}
-              className={`border rounded-lg p-3 flex flex-col gap-2 ${
-                isMine
+              className={`border rounded-lg p-3 flex flex-col gap-2 ${isMine
                   ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/30' // mine
                   : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800' // others
-              }`}
+                }`}
               style={{ alignSelf: isMine ? 'end' : 'start' }}
             >
               <div className="flex items-center gap-2">
@@ -704,7 +706,7 @@ const MediaTab = ({ conversationId }: MediaProps) => {
                 </div>
               </div>
               <a
-                href={`https://escrow.ipcre8.com${data.media.url}`}
+                href={`http://localhost:5000${data.media.url}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-500 hover:underline"

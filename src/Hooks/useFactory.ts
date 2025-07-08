@@ -159,8 +159,22 @@ export const useFactory = () => {
         try {
             if (!multisigFactoryContract) return 0;
             const disputeMembers = await multisigFactoryContract.getDisputeTeamMembers();
-           console.log("team memebers fetched",disputeMembers[0])
+            console.log("team memebers fetched", disputeMembers[0])
 
+        } catch (error) {
+            console.error("Error fetching total escrows", error);
+            return 0;
+        }
+
+
+    }, [multisigFactoryContract])
+
+    const fetchMaxAdoptionLimit = useCallback(async (): Promise<any> => {
+        try {
+            if (!multisigFactoryContract) return 0;
+            const maxResolves = await multisigFactoryContract.maxResolvesPerWindow();
+            console.log("max adoption limit per resolver fetched", maxResolves)
+            return maxResolves
         } catch (error) {
             console.error("Error fetching total escrows", error);
             return 0;
@@ -484,6 +498,7 @@ export const useFactory = () => {
         initaiteDispute,
         resolveDispute,
         fetchDisputeTeamMembers,
-        updateDisputeTeamMembers
+        updateDisputeTeamMembers,
+        fetchMaxAdoptionLimit
     };
 };

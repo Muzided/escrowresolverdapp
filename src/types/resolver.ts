@@ -22,3 +22,11 @@ export interface AdoptedDisputeStates {
 
     ]
 }
+
+export interface ResolvedByMonth {
+  month: string;
+  resolved: number;
+}
+
+export type ResolvedByMonthArray = ResolvedByMonth[];
+

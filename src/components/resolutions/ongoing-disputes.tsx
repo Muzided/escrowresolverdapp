@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 
 import { Skeleton } from "../ui/skeleton"
 
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import PageHeading from "../ui/pageheading"
 import ChatBox from "../chat/ChatBox"
 import DisputeTimingInfo from './dispute-timing-info'
@@ -28,6 +28,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from ".
 import { toast } from "react-toastify"
 import { useDispute } from "@/Hooks/useDispute"
 import { handleError } from "../../../utils/errorHandler"
+import { MileStone } from "@/types/contract"
+import { useNavigateTab } from "@/Hooks/useNavigateTab"
 
 
 
@@ -54,7 +56,7 @@ export function OngoingDisputes() {
   const { data: adoptedDispute, isLoading, error } = useQuery<adoptedDispute[]>({
     queryKey: ['my-escrows', address, currentPage, pageSize],
     queryFn: async () => {
-      const response = await getAdoptedDispute(currentPage, pageSize,"under_review");
+      const response = await getAdoptedDispute(currentPage, pageSize, "under_review");
       return response.data.disputes;
     },
     enabled: !!address,
@@ -71,7 +73,7 @@ export function OngoingDisputes() {
   }
 
 
-  console.log("this is the finest thing")
+  console.log("this is the finest thing", adoptedDispute)
   return (
     <div className="space-y-4">
       {openChatBox ?
@@ -85,7 +87,7 @@ export function OngoingDisputes() {
         <div className="space-y-4">
           <PageHeading text="Time Details" />
 
-          <DisputeTimingInfo/>
+          {adoptedDispute?.length !== 0 && <DisputeTimingInfo />}
 
 
           <PageHeading text="Adopted Disputes" />
@@ -124,18 +126,22 @@ const ActiveDisputeDetails: React.FC<Props> = ({
   const [approveInFavour, setApproveInFavour] = useState(false);
   const [continueNext, setContinueNext] = useState(false);
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { resolveDispute } = useDispute();
+  const {goToTab} = useNavigateTab()
   const queryClient = useQueryClient();
+ 
 
-
-  const handleResolveDispute = async (disputeId: string, milestoneIndex: number,winner:string) => {
+  const handleResolveDispute = async (disputeId: string, milestoneIndex: number, milestone: adoptedDispute) => {
     try {
       setLoading((prev: any) => ({ ...prev, [disputeId]: true }));
-      const res = await resolveDispute(disputeId, milestoneIndex, approveInFavour, continueNext,winner);
-      console.log("hello", res)
+      const winner = approveInFavour ? milestone.escrow.receiver_walletaddress : milestone.escrow.creator_walletaddress;
+      const res = await resolveDispute(disputeId, milestoneIndex, approveInFavour, continueNext, winner);
       if (res?.success) {
 
         await queryClient.invalidateQueries({ queryKey: ['adopted-escrows'] })
+        setIsDialogOpen(false)
+        goToTab('resolved-disputes')
       }
     } catch (error) {
       handleError(error)
@@ -263,10 +269,11 @@ const ActiveDisputeDetails: React.FC<Props> = ({
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Dialog>
+                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                       <Button
                         size="sm"
+                        onClick={() => setIsDialogOpen(true)}
                         disabled={loadingEscrows[disputedEscrow.escrow.escrow_contract_address] || false}
                         className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
                       >
@@ -314,7 +321,7 @@ const ActiveDisputeDetails: React.FC<Props> = ({
                         <Button
                           className="mt-4"
                           disabled={loading[disputedEscrow.dispute_id]}
-                          onClick={() => handleResolveDispute(disputedEscrow.disputeContractAddress, disputedEscrow.milestone_index,disputedEscrow.escrow.creator_walletaddress)}
+                          onClick={() => handleResolveDispute(disputedEscrow.disputeContractAddress, disputedEscrow.milestone_index, disputedEscrow)}
                         >
                           {loading[disputedEscrow.dispute_id] ? "Loading..." : "Submit"}
                         </Button>

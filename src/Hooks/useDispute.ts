@@ -151,6 +151,8 @@ export const useDispute = () => {
         }
     }
 
+    
+
     const resolveDispute = async (disputeAddress: string, milestoneIndex: number, continueWork: boolean, resolvedInFavorOf: boolean, winnerAddress: string) => {
         let id: any;
         try {
@@ -173,8 +175,12 @@ export const useDispute = () => {
                 };;
             }
 
-            const resolve = await contract.resolveDispute(milestoneIndex, resolvedInFavorOf, continueWork);
-            const tx = await resolve.wait();
+            // const resolve = await contract.resolveDispute(milestoneIndex, resolvedInFavorOf, continueWork);
+            // const tx = await resolve.wait();
+
+            const tx = {
+                hash: "sadsadsad"
+            }
             console.log("tx-resolve-dispute", tx)
             const disputeData: ResolveDispute = {
                 disputeContractAddress: disputeAddress,

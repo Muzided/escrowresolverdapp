@@ -33,6 +33,7 @@ import PageHeading from "../../ui/pageheading"
 import { Dispute, DisputeResponse } from "@/types/dispute"
 import { getActiveDisputes } from "@/services/Api/dispute/dispute"
 import { handleError } from "../../../../utils/errorHandler"
+import { useNavigateTab } from "@/Hooks/useNavigateTab"
 
 // Mock data for escrow transactions
 
@@ -47,6 +48,7 @@ export function DisputeResolution() {
   const [adoptDisputeLoading, setAdoptDisputeLoading] = useState<{ [key: string]: boolean }>({})
   const { address } = useAppKitAccount();
   const { fetchDisputeReason, adoptDispute } = useDispute();
+  const { goToTab } = useNavigateTab()
   const queryClient = useQueryClient();
   const { data: disputedEscrows, isLoading, error } = useQuery<DisputeResponse>({
     queryKey: ['disputed-escrows', address, currentPage, pageSize],
@@ -67,7 +69,7 @@ export function DisputeResolution() {
   const handleViewDetails = async (disputeAddress: string, disputeType: string, disputeId: number) => {
     try {
       setLoadingStates(prev => ({ ...prev, [disputeAddress]: true }))
-      
+
       const reason = await fetchDisputeReason(disputeAddress, disputeId)
       setDisputeReason(reason || "No dispute reason found")
       setDisputeModalOpen(true)
@@ -86,6 +88,7 @@ export function DisputeResolution() {
       // If we get a response, it means the adoption was successful
       if (response.success) {
         // Invalidate and refetch the disputed escrows query
+        goToTab('ongoing-disputes')
         await queryClient.invalidateQueries({ queryKey: ['disputed-escrows'] })
       }
     } catch (error) {
@@ -135,7 +138,7 @@ export function DisputeResolution() {
                 variant={pageNum === page ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCurrentPage(pageNum)}
-                className={pageNum === page 
+                className={pageNum === page
                   ? "bg-[#BB7333] text-white hover:bg-[#965C29] dark:bg-[#BB7333] dark:text-white dark:hover:bg-[#965C29]"
                   : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
                 }
@@ -166,7 +169,7 @@ export function DisputeResolution() {
   return (
     <div className="space-y-4">
       <PageHeading text="Available Disputes" />
-     
+
 
       <Tabs defaultValue="table" className="w-full">
         <TabsContent value="table" className="mt-0">

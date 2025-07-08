@@ -1,11 +1,12 @@
 "use client"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 
 import { useEffect, useState } from "react"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
 
 import { Header } from "@/components/layout/header"
 import { Sidebar } from "@/components/layout/sidebar"
-import { ResolverStats } from "@/components/dashboard/resolver-stats"
+import { ResolverStats } from "@/components/dashboard/profile/resolver-stats"
 import { TransactionsTab } from "@/components/dashboard/transaction-tab"
 import { CreateTab } from "@/components/dashboard/create-tab"
 import { DisputeResolution } from "@/components/dashboard/dispute-queue/dispute-resolution"
@@ -17,12 +18,18 @@ import { OngoingDisputes } from "@/components/resolutions/ongoing-disputes"
 
 import ResolvedDisputes from "@/components/resolved-disputes/resolved-disputes"
 
+
 export default function Dashboard() {
   const [isClient, setIsClient] = useState(false)
-  const [activeTab, setActiveTab] = useState("dispute")
+  //const [activeTab, setActiveTab] = useState("dispute")
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const { isAuthenticated} = useUser()
   const { address, isConnected } = useAppKitAccount();
+  // ─── URL helpers ─────────────────────────────────────────────
+  const router = useRouter ()
+  const pathname = usePathname ()                 // e.g. "/dashboard"
+  const searchParams = useSearchParams()
+  const activeTab = searchParams.get("tab") ?? "dispute"
 
   useEffect(() => {
     setIsClient(true) // Ensures document-related code runs only on the client
@@ -32,6 +39,11 @@ export default function Dashboard() {
 
   const toggleMobileNav = () => {
     setIsMobileNavOpen(!isMobileNavOpen)
+  }
+  const setActiveTab = (tab: string) => {
+    const params = new URLSearchParams(searchParams)
+    params.set("tab", tab)
+    router.replace(`${pathname}?${params}`)
   }
 
   return (
