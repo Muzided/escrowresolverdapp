@@ -33,7 +33,7 @@ ChartJS.register(
 
 export function ResolverStats() {
   const { address } = useAppKitAccount();
-  const [maxAdoptionLimit, setMaxAdoptionLimit] = useState();
+  const [maxAdoptionLimit, setMaxAdoptionLimit] = useState(0);
   const { fetchMaxAdoptionLimit } = useFactory()
   const { data: profileStats, isLoading, error } = useQuery<resolverStats>({
     queryKey: ['profile-stats'],
@@ -44,12 +44,13 @@ export function ResolverStats() {
     enabled: !!address,
   });
   useEffect(() => {
-
+    retrevingMaxAdoptionLimit()
   }, [])
 
   const retrevingMaxAdoptionLimit = async () => {
     try {
       const res = await fetchMaxAdoptionLimit()
+      console.log("maxxinglimit",res)
       setMaxAdoptionLimit(res)
     } catch (error) {
       console.log("error while fetching", error)
