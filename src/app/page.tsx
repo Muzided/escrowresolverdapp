@@ -1,5 +1,6 @@
 "use client"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
+import { Suspense } from 'react'
 
 import { useEffect, useState } from "react"
 import { Tabs, TabsContent } from "@/components/ui/tabs"
@@ -17,7 +18,6 @@ import { useUser } from "@/context/userContext"
 import { OngoingDisputes } from "@/components/resolutions/ongoing-disputes"
 
 import ResolvedDisputes from "@/components/resolved-disputes/resolved-disputes"
-
 
 export default function Dashboard() {
   const [isClient, setIsClient] = useState(false)
@@ -62,40 +62,42 @@ export default function Dashboard() {
 
         {/* Main content area with left padding to account for fixed sidebar */}
         <main className="flex-1 overflow-auto p-4 md:p-6 md:ml-64">
-        {!isAuthenticated? 
-          <ConnectPage/>
-           :
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            {/* <DashboardHeader activeTab={activeTab} /> */}
+          <Suspense fallback={<div>Loading...</div>}>
+            {!isAuthenticated? 
+              <ConnectPage/>
+               :
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                {/* <DashboardHeader activeTab={activeTab} /> */}
 
-            <TabsContent value="profilestats" className="mt-0">
-           
-              <ResolverStats />
-            </TabsContent>
+                <TabsContent value="profilestats" className="mt-0">
+               
+                  <ResolverStats />
+                </TabsContent>
 
-            <TabsContent value="ongoing-disputes" className="mt-0">
-            <OngoingDisputes/>
-            </TabsContent>
+                <TabsContent value="ongoing-disputes" className="mt-0">
+                <OngoingDisputes/>
+                </TabsContent>
 
-            
-            <TabsContent value="resolved-disputes" className="mt-0">
-           <ResolvedDisputes/>
-            </TabsContent>
-{/* 
-            <TabsContent value="create" className="mt-0">
-              <CreateTab />
-            </TabsContent> */}
-            <TabsContent value="dispute" className="mt-0">
-             <DisputeResolution/>
-            </TabsContent>
-            {/* <TabsContent value="history" className="mt-0">
-            <TransactionsTab />
-            </TabsContent> */}
-            {/* <TabsContent value="history" className="mt-0">
-           <DaoTab/>
-            </TabsContent> */}
-          </Tabs>
-          }
+                
+                <TabsContent value="resolved-disputes" className="mt-0">
+               <ResolvedDisputes/>
+                </TabsContent>
+            {/* 
+                <TabsContent value="create" className="mt-0">
+                  <CreateTab />
+                </TabsContent> */}
+                <TabsContent value="dispute" className="mt-0">
+                 <DisputeResolution/>
+                </TabsContent>
+                {/* <TabsContent value="history" className="mt-0">
+                <TransactionsTab />
+                </TabsContent> */}
+                {/* <TabsContent value="history" className="mt-0">
+               <DaoTab/>
+                </TabsContent> */}
+              </Tabs>
+            }
+          </Suspense>
         </main>
       </div>
 
