@@ -5,7 +5,7 @@ import { AxiosError } from "axios";
 
 export const RegisterUser = async (wallet_address: string) => {
     try {
-        const response = await axiosService.post<RegistrationVerificationResponse>('/api/auth/authenticate', {
+        const response = await axiosService.post<RegistrationVerificationResponse>('/api/auth/authenticateResolver', {
             wallet_address
         })
 
