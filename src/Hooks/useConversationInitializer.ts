@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getChatMessages, startConversation } from '@/services/Api/chat/chat';
 import { startConversationRequest, ConversationType, ChatMessage, ChatPagination } from '@/types/chat';
 
@@ -9,16 +9,22 @@ export const useConversationInitializer = (
 ) => {
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
   const [messagePagination, setMessagePagination] = useState<ChatPagination>({
     total: 0,
     page: 1,
     limit: 0,
     totalPages: 0
   });
+  
+  // Use ref to track initialization to prevent multiple calls
+  const isInitializing = useRef(false);
+  const hasInitialized = useRef(false);
 
   const handleStartConversation = async () => {
+    if (isInitializing.current) return; // Prevent concurrent calls
+    
     try {
+      isInitializing.current = true;
       const startConvoRequest: startConversationRequest = {
         disputeContractAddress: conversationType.disputeContractAddress,
         target_walletaddress: conversationType.userWalletAddress
@@ -26,31 +32,48 @@ export const useConversationInitializer = (
       const response = await startConversation(startConvoRequest);
       if (response.status === 201 || response.status === 200) {
         setConversationId(response.data._id);
+        hasInitialized.current = true;
         setLoading(false);
       }
     } catch (error) {
       setLoading(false);
       console.log("error while starting conversation", error);
+    } finally {
+      isInitializing.current = false;
     }
   };
 
   useEffect(() => {
     const initializeConversation = async () => {
-      if (!conversationId && !isInitialized && conversationType.disputeContractAddress) {
-        setIsInitialized(true);
+      // If already initialized or initializing, return early
+      if (hasInitialized.current || isInitializing.current) return;
+      
+      if (!conversationId && conversationType.disputeContractAddress) {
         await handleStartConversation();
       } else if (conversationId) {
-        const messagesResponse = await getChatMessages(conversationId);
-        if (messagesResponse.status === 200 && messagesResponse.data) {
-          setMessages(messagesResponse.data.messages);
-          setMessagePagination(messagesResponse.data.pagination);
+        try {
+          const messagesResponse = await getChatMessages(conversationId);
+          if (messagesResponse.status === 200 && messagesResponse.data) {
+            setMessages(messagesResponse.data.messages);
+            setMessagePagination(messagesResponse.data.pagination);
+          }
+          hasInitialized.current = true;
+          setLoading(false);
+        } catch (error) {
+          console.log("error while fetching messages", error);
+          setLoading(false);
         }
-        setLoading(false);
       }
     };
 
     initializeConversation();
-  }, [conversationId, conversationType.disputeContractAddress]);
+  }, [conversationId, conversationType.disputeContractAddress, conversationType.userWalletAddress]);
+
+  // Reset initialization state when conversation type changes significantly
+  useEffect(() => {
+    hasInitialized.current = false;
+    isInitializing.current = false;
+  }, [conversationType.disputeContractAddress]);
 
   return {
     loading,

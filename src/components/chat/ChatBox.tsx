@@ -61,7 +61,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({
   }
 
   return (
-    <div className="flex flex-col p-6 bg-white dark:bg-zinc-900 rounded-lg shadow">
+    <div className="flex flex-col h-full  p-6 bg-white dark:bg-zinc-900 rounded-lg shadow">
       <ChatHeader 
         onGoBack={handleGoBack}
         creatorAddress={dummyChatData.participants.creator}

@@ -15,6 +15,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
   const [media, setMedia] = useState<Media | null>(null);
 
   const handleSend = useCallback(() => {
+    console.log('conversationId',conversationId)
     if ((!message.trim() && !media) || !conversationId) return;
     onSendMessage(message, media);
     setMessage("");

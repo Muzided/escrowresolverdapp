@@ -87,7 +87,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ conversationId }) => {
                 </div>
               </div>
               <a
-                href={`http://localhost:5000${data.media.url}`}
+                href={`https://escrow.ipcre8.com${data.media.url}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-500 hover:underline"
