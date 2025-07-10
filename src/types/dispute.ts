@@ -52,6 +52,7 @@ export interface adoptedDispute {
   disputeContractAddress: string,
   creator_conversation_id: string | null,
   receiver_conversation_id: string | null,
+  observer_conversation_id: string | null,
   status: string,
   type: string,
   escrow: AdoptedEscrow,
@@ -60,6 +61,7 @@ export interface adoptedDispute {
 export interface AdoptedEscrow {
   escrow_contract_address: string,
   creator_walletaddress: string,
+  observer_wallet: string,
   amount: number,
   receiver_walletaddress: string,
   payment_type: string,

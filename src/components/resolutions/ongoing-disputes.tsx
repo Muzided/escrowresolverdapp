@@ -128,9 +128,9 @@ const ActiveDisputeDetails: React.FC<Props> = ({
   const [loading, setLoading] = useState<{ [key: string]: boolean }>({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { resolveDispute } = useDispute();
-  const {goToTab} = useNavigateTab()
+  const { goToTab } = useNavigateTab()
   const queryClient = useQueryClient();
- 
+
 
   const handleResolveDispute = async (disputeId: string, milestoneIndex: number, milestone: adoptedDispute) => {
     try {
@@ -252,6 +252,17 @@ const ActiveDisputeDetails: React.FC<Props> = ({
                           className=" w-full cursor-pointer flex items-center justify-center gap-2 rounded-lg p-6 text-center bg-green-600 text-white hover:bg-green-700 my-2  dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
                           <User />
                           RECEIVER
+                        </div>
+                        <div
+                          onClick={() =>
+                            openChat(
+                              disputedEscrow.observer_conversation_id,
+                              disputedEscrow.escrow.observer_wallet,
+                              disputedEscrow.disputeContractAddress,
+                              "observer")}
+                          className=" w-full cursor-pointer flex items-center justify-center gap-2 rounded-lg p-6 text-center bg-gray-600 text-white hover:bg-green-700 my-2  dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
+                          <User />
+                          OBSERVER
                         </div>
                       </div>
                     </DialogContent>

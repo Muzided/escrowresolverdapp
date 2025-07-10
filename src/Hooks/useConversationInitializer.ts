@@ -15,7 +15,7 @@ export const useConversationInitializer = (
     limit: 0,
     totalPages: 0
   });
-  
+  console.log("usertyupe", conversationType);
   // Use ref to track initialization to prevent multiple calls
   const isInitializing = useRef(false);
   const hasInitialized = useRef(false);
