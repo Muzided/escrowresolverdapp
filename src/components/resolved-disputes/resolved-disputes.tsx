@@ -114,13 +114,13 @@ const ResolvedDisputes = () => {
             </div>
 
             {/* Pagination Controls */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center space-x-2">
-                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                    <span className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
                         Items per page:
                     </span>
                     <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                        <SelectTrigger className="w-20">
+                        <SelectTrigger className="w-16 sm:w-20">
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -132,7 +132,7 @@ const ResolvedDisputes = () => {
                     </Select>
                 </div>
 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-1 sm:space-x-2">
                     <Button
                         variant="outline"
                         size="sm"
@@ -140,10 +140,10 @@ const ResolvedDisputes = () => {
                         disabled={currentPage === 1 || isLoading}
                     >
                         <ChevronLeft className="h-4 w-4" />
-                        Previous
+                        <span className="hidden sm:inline">Previous</span>
                     </Button>
                     
-                    <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                    <span className="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
                         Page {currentPage}
                     </span>
                     
@@ -153,7 +153,7 @@ const ResolvedDisputes = () => {
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={!hasData || adoptedDispute?.length < pageSize || isLoading}
                     >
-                        Next
+                        <span className="hidden sm:inline">Next</span>
                         <ChevronRight className="h-4 w-4" />
                     </Button>
                 </div>

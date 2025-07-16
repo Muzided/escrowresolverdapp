@@ -105,8 +105,8 @@ export function DisputeResolution() {
     const { total, page, totalPages } = disputedEscrows.pagination;
 
     return (
-      <div className="flex items-center justify-between px-2 py-4 flex-wrap gap-2">
-        <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
+      <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 gap-4">
+        <div className="flex items-center gap-2 text-xs sm:text-sm text-zinc-500 dark:text-zinc-400">
           <span>Showing</span>
           <span className="font-medium text-zinc-900 dark:text-white">
             {(page - 1) * pageSize + 1}
@@ -117,9 +117,9 @@ export function DisputeResolution() {
           </span>
           <span>of</span>
           <span className="font-medium text-zinc-900 dark:text-white">{total}</span>
-          <span>results</span>
+          <span className="hidden sm:inline">results</span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Button
             variant="outline"
             size="sm"
@@ -129,7 +129,7 @@ export function DisputeResolution() {
               dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
           >
             <ChevronLeft className="h-4 w-4" />
-            Previous
+            <span className="hidden sm:inline">Previous</span>
           </Button>
           <div className="flex items-center gap-1">
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
@@ -138,10 +138,10 @@ export function DisputeResolution() {
                 variant={pageNum === page ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCurrentPage(pageNum)}
-                className={pageNum === page
+                className={`${pageNum === page
                   ? "bg-[#BB7333] text-white hover:bg-[#965C29] dark:bg-[#BB7333] dark:text-white dark:hover:bg-[#965C29]"
                   : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
-                }
+                } min-w-[32px] sm:min-w-[40px]`}
               >
                 {pageNum}
               </Button>
@@ -155,7 +155,7 @@ export function DisputeResolution() {
             className="border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 
               dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
           >
-            Next
+            <span className="hidden sm:inline">Next</span>
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

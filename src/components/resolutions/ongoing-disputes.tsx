@@ -224,23 +224,24 @@ const ActiveDisputeDetails: React.FC<Props> = ({
                         disabled={loadingEscrows[disputedEscrow.escrow.escrow_contract_address] || false}
                         className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
                       >
-                        <MessageSquare /> Chat
+                        <MessageSquare /> <span className="hidden sm:inline">Chat</span>
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
+                    <DialogContent className="sm:max-w-[500px] w-[95vw] max-w-[95vw]">
                       <DialogHeader>
-                        <DialogTitle className="flex items-center justify-center gap-2"> <MessagesSquare /> Chat With</DialogTitle>
+                        <DialogTitle className="flex items-center justify-center gap-2 text-sm sm:text-base"> <MessagesSquare /> Chat With</DialogTitle>
                       </DialogHeader>
-                      <div className=" flex gap-2  w-full  mt-4">
+                      <div className="flex flex-col sm:flex-row gap-2 w-full mt-4">
                         <div onClick={() =>
                           openChat(
                             disputedEscrow.creator_conversation_id,
                             disputedEscrow.escrow.creator_walletaddress,
                             disputedEscrow.disputeContractAddress,
                             "creator")
-                        } className="w-full p-6 cursor-pointer flex items-center justify-center gap-2 rounded-lg text-center bg-green-600 text-white hover:bg-green-700 my-2  dark:bg-green-600 dark:text-white dark:hover:bg-green-700">
+                        } className="w-full p-4 sm:p-6 cursor-pointer flex items-center justify-center gap-2 rounded-lg text-center bg-green-600 text-white hover:bg-green-700 my-1 sm:my-2 text-sm sm:text-base dark:bg-green-600 dark:text-white dark:hover:bg-green-700">
                           <UserCheck />
-                          CREATOR
+                          <span className="hidden sm:inline">CREATOR</span>
+                          <span className="sm:hidden">Creator</span>
                         </div>
                         <div
                           onClick={() =>
@@ -249,21 +250,25 @@ const ActiveDisputeDetails: React.FC<Props> = ({
                               disputedEscrow.escrow.receiver_walletaddress,
                               disputedEscrow.disputeContractAddress,
                               "receiver")}
-                          className=" w-full cursor-pointer flex items-center justify-center gap-2 rounded-lg p-6 text-center bg-green-600 text-white hover:bg-green-700 my-2  dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
+                          className="w-full cursor-pointer flex items-center justify-center gap-2 rounded-lg p-4 sm:p-6 text-center bg-green-600 text-white hover:bg-green-700 my-1 sm:my-2 text-sm sm:text-base dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
                           <User />
-                          RECEIVER
+                          <span className="hidden sm:inline">RECEIVER</span>
+                          <span className="sm:hidden">Receiver</span>
                         </div>
-                        <div
-                          onClick={() =>
-                            openChat(
-                              disputedEscrow.observer_conversation_id,
-                              disputedEscrow.escrow.observer_wallet,
-                              disputedEscrow.disputeContractAddress,
-                              "observer")}
-                          className=" w-full cursor-pointer flex items-center justify-center gap-2 rounded-lg p-6 text-center bg-gray-600 text-white hover:bg-green-700 my-2  dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
-                          <User />
-                          OBSERVER
-                        </div>
+                        {disputedEscrow.escrow.observer_wallet !== "0x0000000000000000000000000000000000000000" && (
+                          <div
+                            onClick={() =>
+                              openChat(
+                                disputedEscrow.observer_conversation_id,
+                                disputedEscrow.escrow.observer_wallet,
+                                disputedEscrow.disputeContractAddress,
+                                "observer")}
+                            className="w-full cursor-pointer flex items-center justify-center gap-2 rounded-lg p-4 sm:p-6 text-center bg-gray-600 text-white hover:bg-green-700 my-1 sm:my-2 text-sm sm:text-base dark:bg-yellow-600 dark:text-white dark:hover:bg-yellow-700">
+                            <User />
+                            <span className="hidden sm:inline">OBSERVER</span>
+                            <span className="sm:hidden">Observer</span>
+                          </div>
+                        )}
                       </div>
                     </DialogContent>
                   </Dialog>
