@@ -98,3 +98,27 @@ export const DISPUTE_CONSTANTS = {
   COOLDOWN_REFRESH_INTERVAL: 60000, // 1 minute
   QUERY_STALE_TIME: 30000, // 30 seconds
 } as const;
+
+export interface AffectedMilestone {
+  index: number;
+  amount: number;
+  _id: string;
+}
+
+export interface DisputeResolution {
+  dispute_contract_address: string;
+  escrow_creator_walletaddress: string;
+  escrow_receiver_walletaddress: string;
+  resolved_in_favor_of_walletaddress: string;
+  continue_work: boolean;
+  is_milestone_dispute: boolean;
+  affected_milestones: AffectedMilestone[];
+  total_returned_amount: number;
+  tx_hash: string;
+  resolution_date: string;
+}
+
+export interface DisputeResolutionResponse {
+  success: boolean;
+  resolution: DisputeResolution;
+}

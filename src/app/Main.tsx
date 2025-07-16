@@ -17,7 +17,7 @@ import DaoTab from "@/components/dashboard/doa-tab"
 import { useUser } from "@/context/userContext"
 import { OngoingDisputes } from "@/components/resolutions/ongoing-disputes"
 
-import ResolvedDisputes from "@/components/resolved-disputes/resolved-disputes"
+import { ResolvedDisputes } from "@/components/resolved-disputes/resolved-disputes"
 
 export default function Main() {
   const [isClient, setIsClient] = useState(false)

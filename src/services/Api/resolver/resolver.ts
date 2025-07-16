@@ -1,5 +1,6 @@
 import { axiosService } from "../apiConfig"
 import { AdoptedDisputeStates, ResolvedByMonthArray, resolverStats } from "@/types/resolver"
+import { DisputeResolutionResponse } from "@/types/dispute"
 
 
 export const getResolverStats = async () => {
@@ -40,6 +41,16 @@ export const getResolverGraphData = async () => {
         return response;
     } catch (error) {
         console.log("error while fetching resolver graph data", error)
+        throw error
+    }
+}
+
+export const getDisputedResolutionHistory = async (disputeContractAddress: string) => {
+    try {
+        const response = await axiosService.get<DisputeResolutionResponse>(`api/transaction/getDisputeResolutionTransaction/${disputeContractAddress}`)
+        return response;
+    } catch (error) {
+        console.log("error while fetching resolution history", error)
         throw error
     }
 }

@@ -1,6 +1,6 @@
 import { EscrowCreationResponse } from "@/types/contract"
 import { axiosService } from "../apiConfig"
-import { AdoptedDisputeResponse, DisputeResponse, ResolveDispute } from "@/types/dispute"
+import { AdoptedDisputeResponse, DisputeResolutionResponse, DisputeResponse, ResolveDispute } from "@/types/dispute"
 import { toast } from "react-toastify"
 
 
@@ -29,7 +29,7 @@ export const saveadpotedDispute = async (disputeAddress: string, transactionHash
     }
 }
 
-export const getAdoptedDispute = async (page: number = 1, limit: number = 10, status: string ) => {
+export const getAdoptedDispute = async (page: number = 1, limit: number = 10, status: string) => {
     try {
         const response = await axiosService.get<AdoptedDisputeResponse>(`api/resolver/myAdoptedDisputes?status=${status}`)
         return response
@@ -38,7 +38,9 @@ export const getAdoptedDispute = async (page: number = 1, limit: number = 10, st
         throw error
     }
 }
-export const resolvedEscrows = async (page: number = 1, limit: number = 10, status: string ) => {
+
+
+export const resolvedEscrows = async (page: number = 1, limit: number = 10, status: string) => {
     try {
         const response = await axiosService.get<AdoptedDisputeResponse>(`api/resolver/myAdoptedDisputes?status=${status}`)
         return response
@@ -55,6 +57,16 @@ export const savedResolvedDispute = async (resolveDisputeData: ResolveDispute) =
         return response
     } catch (error) {
         console.log("error while saving resolved dispute", error)
+        throw error
+    }
+}
+
+export const getDisputedResolutionHistory = async (disputeContractAddress: string) => {
+    try {
+        const response = await axiosService.get<DisputeResolutionResponse>(`api/transaction/getDisputeResolutionTransaction/${disputeContractAddress}`)
+        return response
+    } catch (error) {
+        console.log("error while fetching dispute resolution history", error)
         throw error
     }
 }
