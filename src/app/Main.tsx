@@ -21,7 +21,6 @@ import { ResolvedDisputes } from "@/components/resolved-disputes/resolved-disput
 
 export default function Main() {
   const [isClient, setIsClient] = useState(false)
-  //const [activeTab, setActiveTab] = useState("dispute")
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const { isAuthenticated} = useUser()
   const { address, isConnected } = useAppKitAccount();
