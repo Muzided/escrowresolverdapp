@@ -32,8 +32,12 @@ import { useRouter } from "next/navigation"
 import PageHeading from "../../ui/pageheading"
 import { Dispute, DisputeResponse } from "@/types/dispute"
 import { getActiveDisputes } from "@/services/Api/dispute/dispute"
-import { handleError } from "../../../../utils/errorHandler"
+import { handleError, handleApiError } from "../../../../utils/errorHandler"
 import { useNavigateTab } from "@/Hooks/useNavigateTab"
+import { Input } from "@/components/ui/input"
+import { useUser } from "@/context/userContext"
+import { updateUserEmail } from "@/services/Api/auth/auth"
+import { toast } from "react-toastify"
 
 // Mock data for escrow transactions
 
@@ -46,10 +50,14 @@ export function DisputeResolution() {
   const [disputeReason, setDisputeReason] = useState<string>("")
   const [loadingStates, setLoadingStates] = useState<{ [key: string]: boolean }>({})
   const [adoptDisputeLoading, setAdoptDisputeLoading] = useState<{ [key: string]: boolean }>({})
+  const [showEmailModal, setShowEmailModal] = useState(false)
+  const [userEmail, setUserEmail] = useState<string>("")
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState<boolean>(false)
   const { address } = useAppKitAccount();
   const { fetchDisputeReason, adoptDispute } = useDispute();
   const { goToTab } = useNavigateTab()
   const queryClient = useQueryClient();
+  const { user, setUser } = useUser()
   const { data: disputedEscrows, isLoading, error } = useQuery<DisputeResponse>({
     queryKey: ['disputed-escrows', address, currentPage, pageSize],
     queryFn: async () => {
@@ -83,6 +91,11 @@ export function DisputeResolution() {
 
   const handleAdoptDispute = async (disputeAddress: string, milestoneIndex: number) => {
     try {
+      if (!user?.email) {
+        setUserEmail("")
+        setShowEmailModal(true)
+        return
+      }
       setAdoptDisputeLoading(prev => ({ ...prev, [disputeAddress]: true }))
       const response = await adoptDispute(disputeAddress, milestoneIndex)
       // If we get a response, it means the adoption was successful
@@ -96,6 +109,36 @@ export function DisputeResolution() {
       handleError(error)
     } finally {
       setAdoptDisputeLoading(prev => ({ ...prev, [disputeAddress]: false }))
+    }
+  }
+
+  const handleEmailUpdate = async () => {
+    if (!userEmail || !userEmail.includes('@')) {
+      toast.error("Please enter a valid email address")
+      return
+    }
+
+    if (userEmail.length > 254) {
+      toast.error("Email address cannot be longer than 254 characters")
+      return
+    }
+
+    setIsUpdatingEmail(true)
+    try {
+      const response = await updateUserEmail(userEmail);
+
+      if (response.status === 200) {
+        console.log("response", response)
+        toast.success(response?.data?.message)
+        setShowEmailModal(false)
+        setUser(response?.data?.user);
+      }
+    } catch (error) {
+      console.error("Error updating email:", error)
+
+      handleApiError(error)
+    } finally {
+      setIsUpdatingEmail(false)
     }
   }
 
@@ -163,7 +206,6 @@ export function DisputeResolution() {
     );
   };
 
-  console.log("disputed-escrows", disputedEscrows)
 
 
   return (
@@ -254,7 +296,7 @@ export function DisputeResolution() {
                       </TableCell>
                       {/* viewEscrow details */}
 
-                      <div className="flex gap-2">
+                      <TableCell className="flex gap-2">
                         <Button
                           size="sm"
                           className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
@@ -271,7 +313,7 @@ export function DisputeResolution() {
                         >
                           Adopt Dispute
                         </Button>
-                      </div>
+                      </TableCell>
 
                     </TableRow>
                   ))
@@ -294,6 +336,27 @@ export function DisputeResolution() {
               <p className="text-gray-700 dark:text-gray-300">{disputeReason}</p>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showEmailModal} onOpenChange={setShowEmailModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add your email to adopt disputes</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <Input
+              type="email"
+              placeholder="you@example.com"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEmailModal(false)} disabled={isUpdatingEmail}>Cancel</Button>
+            <Button onClick={handleEmailUpdate} disabled={isUpdatingEmail} className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]">
+              {isUpdatingEmail ? 'Updating...' : 'Update'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

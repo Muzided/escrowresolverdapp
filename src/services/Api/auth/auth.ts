@@ -12,7 +12,7 @@ export const RegisterUser = async (wallet_address: string) => {
         return response
     } catch (error) {
         console.log("error while logging in", error)
-        return null
+        throw error
     }
 }
 
@@ -26,8 +26,7 @@ export const AuthenticatieUser = async (wallet_address: string, signature: strin
 
         return response
     } catch (error) {
-        console.log("error while logging in", error)
-        return null
+      throw error
     }
 }
 export const updateUserEmail = async (email: string) => {

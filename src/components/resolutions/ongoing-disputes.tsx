@@ -73,7 +73,6 @@ export function OngoingDisputes() {
   }
 
 
-  console.log("this is the finest thing", adoptedDispute)
   return (
     <div className="space-y-4 ">
       {openChatBox ?
