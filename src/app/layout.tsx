@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Web3Provider } from '@/context/Web3Context';
 import { UserProvider } from '@/context/userContext';
 import { EscrowProvider } from '@/context/EscrowContext';
+import { SocketProvider } from '@/context/SocketContext';
 
 const queryClient = new QueryClient()
 const poppins = Poppins({
@@ -24,7 +25,7 @@ const customToastStyle = {
   boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // Optional: shadow for depth
 }
 
- const metadata = {
+const metadata = {
   title: 'MultiSig',
   manifest: '/manifest.webmanifest',
   themeColor: '#000000',
@@ -54,17 +55,19 @@ export default function RootLayout({
           toastStyle={customToastStyle}
         />
         <ThemeProvider attribute="class" defaultTheme="dark" >
-        <QueryClientProvider client={queryClient}>
-          <AppKit>
+          <QueryClientProvider client={queryClient}>
+            <AppKit>
 
-            <Web3Provider>
-            <UserProvider>
-            <EscrowProvider>
-              {children}
-              </EscrowProvider>
-              </UserProvider>
-            </Web3Provider>
-          </AppKit>
+              <Web3Provider>
+                <SocketProvider>
+                  <UserProvider>
+                    <EscrowProvider>
+                      {children}
+                    </EscrowProvider>
+                  </UserProvider>
+                </SocketProvider>
+              </Web3Provider>
+            </AppKit>
           </QueryClientProvider>
         </ThemeProvider>
       </body>

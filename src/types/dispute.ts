@@ -57,6 +57,10 @@ export interface adoptedDispute {
   type: string,
   escrow: AdoptedEscrow,
   milestone_index: number
+  creator_vote: boolean | null,
+  receiver_vote: boolean | null,
+  decision_initiated: string | null,
+  decision_in_favor_of: string | null
 }
 export interface AdoptedEscrow {
   escrow_contract_address: string,

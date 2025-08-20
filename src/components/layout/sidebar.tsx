@@ -12,9 +12,9 @@ interface SidebarProps {
 
 
 export function Sidebar({ activeTab, setActiveTab, isMobileNavOpen }: SidebarProps) {
-  const {isDisputeMember} = useWeb3()
 
-  console.log("isDisputeMember",isDisputeMember)
+
+
   const navItems = [
    
     {
@@ -47,9 +47,8 @@ export function Sidebar({ activeTab, setActiveTab, isMobileNavOpen }: SidebarPro
     // },
   ]
 
-  const filteredNavItems = isDisputeMember 
-  ? navItems.filter((item) => item.id !== "dispute") 
-  : navItems;
+  const filteredNavItems = navItems 
+
   return (
     <>
       {/* Desktop Sidebar */}

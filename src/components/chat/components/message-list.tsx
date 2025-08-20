@@ -20,7 +20,7 @@ export const MessageList = React.memo<MessageListProps>(({
       new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime()
     );
   }, [messages]);
-
+console.log("sortedMessages",sortedMessages)
   useEffect(() => {
     if (shouldScrollToBottom && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -105,7 +105,7 @@ export const MessageList = React.memo<MessageListProps>(({
         <MessageBubble
           key={msg.message_id}
           message={msg}
-          isOwn={msg.sender._id === senderId}
+          isOwn={msg?.sender?._id === senderId}
         />
       ))}
       

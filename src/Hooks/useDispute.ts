@@ -85,6 +85,8 @@ export const useDispute = () => {
             console.error("Error adopting dispute:", errorString);
             if (errorString.includes("resolver has hit their throughput limit")) {
                 toast.update(id, { render: "You have hit your adoption limit.", type: "error", isLoading: false, autoClose: 3000 });
+            } else if (errorString.includes("resolver already has too many open disputes")) {
+                toast.update(id, { render: "You have already reached adoption limit.", type: "error", isLoading: false, autoClose: 3000 });
             } else {
                 toast.update(id, { render: "Error occurred while adopting dispute", type: "error", isLoading: false, autoClose: 3000 });
             }

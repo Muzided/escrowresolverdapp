@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { useWeb3 } from './Web3Context'
 import { RegistrationVerificationResponse, User } from '@/types/user'
 import { AuthenticatieUser, isUserRejectedSignatureError, RegisterUser } from '@/services/Api/auth/auth'  
+import { toast } from 'react-toastify'
 
 
 
@@ -23,7 +24,7 @@ interface UserProviderProps {
 
 export function UserProvider({ children }: UserProviderProps) {
     // Get wallet data from Web3Context
-    const { account, signer, isConnected , disconnectWallet} = useWeb3();
+    const { account, signer, isConnected , disconnectWallet,setAccount} = useWeb3();
 
     // User state
     const [user, setUser] = useState<User | null>(null);
@@ -43,20 +44,19 @@ export function UserProvider({ children }: UserProviderProps) {
         if (!isConnected) {
             setUser(null);
             setIsAuthenticated(false);
+            setAccount('')
         }
     }, [isConnected]);
-
     // Check if the wallet address is already authenticated
     const checkAuthentication = async () => {
-        if (!account) return;
-
+        if (!account && !isConnected) return;
         setIsLoading(true);
         try {
             //register user if not registered
             const response = await RegisterUser(account)
-            console.log("response", response)
             if (response?.status === 200) {
                 //sign message and authenticate user
+               toast(response.data.message)
                 if (signer) {
                     const signature = await signer.signMessage(response.data.toSign);
                     const authResponse = await AuthenticatieUser(account, signature)
@@ -71,9 +71,16 @@ export function UserProvider({ children }: UserProviderProps) {
                 //  setUser(response.data.toSign);
                 // setIsAuthenticated(true);
             }
-        } catch (err) {
+        } catch (err:any) {
+            console.log("error while resolver in userContext", err)
+            if(err?.status === 400){
+                toast(err.message)
+                 disconnectWallet()
+                 setAccount('')
+            }
             if (isUserRejectedSignatureError(err)) {
                 disconnectWallet()
+                setAccount('')
               }
         } finally {
             setIsLoading(false);
@@ -81,7 +88,6 @@ export function UserProvider({ children }: UserProviderProps) {
     };
 
    
-console.log("isAuthenticated",isAuthenticated)
 
 
     return (

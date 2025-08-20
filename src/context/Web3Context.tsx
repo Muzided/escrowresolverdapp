@@ -17,8 +17,8 @@ interface Web3ContextType {
     chainId: number | null;
     multisigFactoryContract: ethers.Contract | null;
     erc20TokenContract: ethers.Contract | null;
-    isDisputeMember: boolean
     disconnectWallet: () => void;
+    setAccount: (account: string) => void;
 }
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined);
@@ -44,7 +44,7 @@ export function Web3Provider({ children }: Web3ProviderProps) {
     const [multisigFactoryContract, setMultisigFactoryContract] = useState<ethers.Contract | null>(null);
     const [escrowContract, setEscrowContract] = useState<ethers.Contract | null>(null);
     const [erc20TokenContract, setErc20TokenContract] = useState<ethers.Contract | null>(null);
-    const [isDisputeMember, setIsDisputeMember] = useState<boolean>(false);
+
 
 
 
@@ -72,10 +72,7 @@ export function Web3Provider({ children }: Web3ProviderProps) {
             const erc20TokenContract = new ethers.Contract(Usdt_Contract_Address, Erc20TokenAbi, signer);
             const userAddress = await signer.getAddress()
 
-            // const disputeMembers = await factoryContract.getDisputeTeamMembers();
-            // const isUserInDisputeTeam = disputeMembers.includes(userAddress);
-
-//console.log('checks that happen',isUserInDisputeTeam)
+           
             setProvider(ethersProvider);
             setSigner(signer);
             setAccount(userAddress);
@@ -90,14 +87,6 @@ export function Web3Provider({ children }: Web3ProviderProps) {
         }
     };
 
-    //console.log("after intializations", provider, signer, account, chainId, multisigFactoryContract)
-    // Handle disconnection: Reset state and redirect to "/"
-    // useEffect(() => {
-    //     if (!isConnected) {
-    //         resetState();
-    //         router.push('/');
-    //     }
-    // }, [isConnected]);
 
     // Function to reset Web3 state on disconnect
     const resetState = () => {
@@ -122,7 +111,7 @@ export function Web3Provider({ children }: Web3ProviderProps) {
             multisigFactoryContract,
             erc20TokenContract,
             disconnectWallet,
-            isDisputeMember
+            setAccount
         }}>
             {children}
         </Web3Context.Provider>
