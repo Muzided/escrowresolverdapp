@@ -19,6 +19,7 @@ import PageHeading from "../ui/pageheading"
 import ChatBox from "../chat/ChatBox"
 import DisputeTimingInfo from './dispute-timing-info'
 import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { useDisputeRoomListener } from "@/Hooks/useDisputeRoomListener"
 import { adoptedDispute, AdoptedDisputeResponse } from "@/types/dispute"
 import { getAdoptedDispute } from "@/services/Api/dispute/dispute"
 import { ConversationType } from "@/types/chat"
@@ -30,6 +31,7 @@ import { useDispute } from "@/Hooks/useDispute"
 import { handleError } from "../../../utils/errorHandler"
 import { MileStone } from "@/types/contract"
 import { useNavigateTab } from "@/Hooks/useNavigateTab"
+import { ResolveDisputeModal } from './ResolveDisputeModal'
 
 
 
@@ -52,6 +54,7 @@ export function OngoingDisputes() {
   //next-router
   const router = useRouter()
   const { address } = useAppKitAccount();
+  const queryClient = useQueryClient();
 
   const { data: adoptedDispute, isLoading, error } = useQuery<adoptedDispute[]>({
     queryKey: ['my-escrows', address, currentPage, pageSize],
@@ -61,6 +64,9 @@ export function OngoingDisputes() {
     },
     enabled: !!address,
   });
+
+  // Hook to join dispute rooms and listen for reload events
+  useDisputeRoomListener(adoptedDispute?.map(d => d.disputeContractAddress) ?? [], { enabled: !!address })
 
   const navgateToDetailPage = (id: string) => {
     router.push(`/escrow/${id}`)
@@ -284,65 +290,7 @@ const ActiveDisputeDetails: React.FC<Props> = ({
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        onClick={() => setIsDialogOpen(true)}
-                        disabled={loadingEscrows[disputedEscrow.escrow.escrow_contract_address] || false}
-                        className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
-                      >
-                        Resolve
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle className="flex items-center justify-center gap-2">
-                          Resolve Dispute</DialogTitle>
-                      </DialogHeader>
-                      <div className="flex flex-col gap-6 w-full mt-4">
-                        {/* Approve in favour Dropdown */}
-                        <div className="flex items-center justify-between gap-4">
-                          <Label htmlFor={`approve-in-favour-${disputedEscrow.dispute_id}`}>Approve in favour</Label>
-                          <Select
-                            value={approveInFavour ? "receiver" : "creator"}
-                            onValueChange={(value) => setApproveInFavour(value === "receiver")}
-                          >
-                            <SelectTrigger className="w-36">
-                              <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="receiver">Receiver</SelectItem>
-                              <SelectItem value="creator">Creator</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        {/* Continue Next Dropdown */}
-                        <div className="flex items-center justify-between gap-4">
-                          <Label htmlFor={`continue-next-${disputedEscrow.dispute_id}`}>Continue Next</Label>
-                          <Select
-                            value={continueNext ? "continue" : "stop"}
-                            onValueChange={(value) => setContinueNext(value === "continue")}
-                          >
-                            <SelectTrigger className="w-36">
-                              <SelectValue placeholder="Select" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="continue">Continue Project</SelectItem>
-                              <SelectItem value="stop">Stop Funds</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button
-                          className="mt-4"
-                          disabled={loading[disputedEscrow.dispute_id]}
-                          onClick={() => handleResolveDispute(disputedEscrow.disputeContractAddress, disputedEscrow.milestone_index, disputedEscrow)}
-                        >
-                          {loading[disputedEscrow.dispute_id] ? "Loading..." : "Submit"}
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                  <ResolveDisputeModal disputedEscrow={disputedEscrow} />
                 </TableCell>
               </TableRow>
             ))

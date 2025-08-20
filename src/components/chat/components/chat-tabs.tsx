@@ -25,6 +25,7 @@ export const ChatTabs: React.FC<ChatTabsProps> = ({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const handleMessageReceived = useCallback((message: ChatMessage) => {
+    console.log("message-received",message)
     setAllMessages(prev => {
       const exists = prev.some(msg => msg.message_id === message.message_id);
       if (exists) return prev;

@@ -70,3 +70,17 @@ export const getDisputedResolutionHistory = async (disputeContractAddress: strin
         throw error
     }
 }
+
+export const initateDecision = async (disputeContractAddress: string, inFavorOf: string) => {
+    try {
+        const response = await axiosService.post(`api/resolver/initiate-decision`, {
+            dispute_contract_address: disputeContractAddress,
+            in_favor_of:"creator"
+        })
+        //status code 201
+        return response
+    } catch (error) {
+        console.log("error while initiating decision", error)
+        throw error
+    }
+}
