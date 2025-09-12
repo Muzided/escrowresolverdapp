@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import { useWeb3 } from './Web3Context'
 import { RegistrationVerificationResponse, User } from '@/types/user'
-import { AuthenticatieUser, isUserRejectedSignatureError, RegisterUser } from '@/services/Api/auth/auth'  
+import { AuthenticatieUser, isUserRejectedSignatureError, RegisterUser } from '@/services/Api/auth/auth'
 import { toast } from 'react-toastify'
 
 
@@ -10,6 +10,7 @@ import { toast } from 'react-toastify'
 interface UserContextType {
     user: User | null;
     setUser: (user: User | null) => void;
+    getToken: () => string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     error: string | null;
@@ -24,7 +25,7 @@ interface UserProviderProps {
 
 export function UserProvider({ children }: UserProviderProps) {
     // Get wallet data from Web3Context
-    const { account, signer, isConnected , disconnectWallet,setAccount} = useWeb3();
+    const { account, signer, isConnected, disconnectWallet, setAccount } = useWeb3();
 
     // User state
     const [user, setUser] = useState<User | null>(null);
@@ -47,6 +48,7 @@ export function UserProvider({ children }: UserProviderProps) {
             setAccount('')
         }
     }, [isConnected]);
+
     // Check if the wallet address is already authenticated
     const checkAuthentication = async () => {
         if (!account && !isConnected) return;
@@ -56,7 +58,7 @@ export function UserProvider({ children }: UserProviderProps) {
             const response = await RegisterUser(account)
             if (response?.status === 200) {
                 //sign message and authenticate user
-               toast(response.data.message)
+                toast(response.data.message)
                 if (signer) {
                     const signature = await signer.signMessage(response.data.toSign);
                     const authResponse = await AuthenticatieUser(account, signature)
@@ -71,29 +73,35 @@ export function UserProvider({ children }: UserProviderProps) {
                 //  setUser(response.data.toSign);
                 // setIsAuthenticated(true);
             }
-        } catch (err:any) {
+        } catch (err: any) {
             console.log("error while resolver in userContext", err)
-            if(err?.status === 400){
+            if (err?.status === 400) {
                 toast(err.message)
-                 disconnectWallet()
-                 setAccount('')
+                disconnectWallet()
+                setAccount('')
             }
             if (isUserRejectedSignatureError(err)) {
                 disconnectWallet()
                 setAccount('')
-              }
+            }
         } finally {
             setIsLoading(false);
         }
     };
 
-   
+    //get token from local storage
+    const getToken = () => {
+        return localStorage.getItem("token");
+    }
+
+
 
 
     return (
         <UserContext.Provider value={{
             user,
             setUser,
+            getToken,
             isAuthenticated,
             isLoading,
             error

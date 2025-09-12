@@ -72,7 +72,7 @@ export function DisputeResolution() {
     router.push(`/escrow/${id}`)
   }
 
-
+console.log("checking some stuff",disputedEscrows?.disputes)
 
   const handleViewDetails = async (disputeAddress: string, disputeType: string, disputeId: number) => {
     try {
@@ -264,7 +264,7 @@ export function DisputeResolution() {
                         {escrow.dispute_contract_address?.slice(0, 8)}...{escrow.dispute_contract_address?.slice(-7)}
                       </TableCell>
                       <TableCell>
-                        {escrow.escrowDetails.escrow_contract_address?.slice(0, 8)}...{escrow.escrowDetails.escrow_contract_address?.slice(-7)} </TableCell>
+                        {escrow.escrowDetails?.escrow_contract_address?.slice(0, 8)}...{escrow.escrowDetails?.escrow_contract_address?.slice(-7)} </TableCell>
                       {/* <TableCell>
                         {escrow.reason.slice(0, 12)}...
                           <Dialog>

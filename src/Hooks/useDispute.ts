@@ -176,7 +176,7 @@ export const useDispute = () => {
                     message: "Dispute resolved successfully"
                 };;
             }
-
+  console.log("contract", milestoneIndex, resolvedInFavorOf, continueWork)
             const resolve = await contract.resolveDispute(milestoneIndex, resolvedInFavorOf, continueWork);
             const tx = await resolve.wait();
 
