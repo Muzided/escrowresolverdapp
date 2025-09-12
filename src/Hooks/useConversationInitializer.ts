@@ -31,6 +31,7 @@ export const useConversationInitializer = (
       };
       const response = await startConversation(startConvoRequest);
       if (response.status === 201 || response.status === 200) {
+        console.log("response from starting conversation in hook", response);
         setConversationId(response.data._id);
         hasInitialized.current = true;
         setLoading(false);
