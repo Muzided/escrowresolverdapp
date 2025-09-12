@@ -2,12 +2,20 @@ export interface startChatRequest {
   otherUserId: string;
 }
 
+
+
 export interface ConversationResponse {
+  success: boolean;
+  conversation: Conversation;
+}
+
+export interface Conversation {
   _id: string;
-  participants: string[];
+  participantHash: string;
   disputeId: string;
-  createdAt: string;
   __v: number;
+  createdAt: string;
+  participants: string[];
 }
 
 export interface startConversationRequest {
