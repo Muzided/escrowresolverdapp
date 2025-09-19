@@ -79,7 +79,8 @@ console.log("checking some stuff",disputedEscrows?.disputes)
       setLoadingStates(prev => ({ ...prev, [disputeAddress]: true }))
 
       const reason = await fetchDisputeReason(disputeAddress, disputeId)
-      setDisputeReason(reason || "No dispute reason found")
+      console.log("dispute reason", reason)
+      setDisputeReason(reason)
       setDisputeModalOpen(true)
     } catch (error) {
       console.error("Error fetching dispute reason:", error)
