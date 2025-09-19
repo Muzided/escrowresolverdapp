@@ -29,6 +29,7 @@ export function UserProvider({ children }: UserProviderProps) {
 
     // User state
     const [user, setUser] = useState<User | null>(null);
+    const [token,setToken] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -65,7 +66,9 @@ export function UserProvider({ children }: UserProviderProps) {
                     if (authResponse?.status === 200) {
                         //set user and isAuthenticated to true
                         setUser(authResponse.data.user);
+                        setToken(authResponse.data.token);
                         localStorage.setItem("token", authResponse.data.token)
+                        
                         setIsAuthenticated(true);
                     }
                 }
