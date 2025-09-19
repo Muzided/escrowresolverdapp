@@ -43,11 +43,11 @@ export function ResolvedDisputes() {
     setCurrentPage(1);
   };
 
-  const handleViewResolutionDetails = async (disputeContractAddress: string) => {
+  const handleViewResolutionDetails = async (disputeContractAddress: string,milestoneIndex:number) => {
     try {
       setLoadingStates(prev => ({ ...prev, [disputeContractAddress]: true }));
       
-      const response = await getDisputedResolutionHistory(disputeContractAddress);
+      const response = await getDisputedResolutionHistory(disputeContractAddress,milestoneIndex);
       setSelectedResolution(response.data);
       setIsResolutionModalOpen(true);
       
@@ -123,7 +123,7 @@ export function ResolvedDisputes() {
       </div>
     );
   }
-
+console.log("adoptedDispute", adoptedDispute)
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -175,7 +175,7 @@ export function ResolvedDisputes() {
                           <Button
                             size="sm"
                             className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
-                            onClick={() => handleViewResolutionDetails(dispute.disputeContractAddress)}
+                            onClick={() => handleViewResolutionDetails(dispute.disputeContractAddress,dispute.milestone_index)}
                             disabled={loadingStates[dispute.disputeContractAddress]}
                           >
                             {loadingStates[dispute.disputeContractAddress] ? (
