@@ -82,9 +82,20 @@ export const useSocketChat = ({
     }
   }, [conversationId, senderId, isConnected, emit]);
 
+
+    // Mark messages as read for this conversation
+  const markAsRead = useCallback((convId: string, userId: string) => {
+    if (!isConnected) return;
+    try {
+      emit('markAsRead', { conversationId: convId, userId });
+    } catch (err) {
+     console.log('Mark as read error:', err);
+    }
+  }, [isConnected, emit]);
   return {
     sendMessage,
     isConnected,
+    markAsRead,
     error,
   };
 }; 
