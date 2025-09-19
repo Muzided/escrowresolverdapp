@@ -75,7 +75,7 @@ export const initateDecision = async (disputeContractAddress: string, inFavorOf:
     try {
         const response = await axiosService.post(`api/resolver/initiate-decision`, {
             dispute_contract_address: disputeContractAddress,
-            in_favor_of:"creator"
+            in_favor_of:inFavorOf
         })
         //status code 201
         return response

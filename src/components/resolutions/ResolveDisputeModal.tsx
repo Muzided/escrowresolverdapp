@@ -108,7 +108,7 @@ export const ResolveDisputeModal: React.FC<ResolveDisputeModalProps> = ({ disput
   const handleInitiateDecision = useCallback(async () => {
     try {
       setIsInitiating(true)
-      const inFavorOf = approveInFavour === 'receiver' ? receiverWallet : creatorWallet
+      const inFavorOf = approveInFavour === 'receiver' ? "receiver" : "creator"
       const response = await initateDecision(disputedEscrow.disputeContractAddress, inFavorOf)
       if (response?.status === 201 || response?.status === 200) {
         await queryClient.invalidateQueries({ queryKey: ['my-escrows'] })

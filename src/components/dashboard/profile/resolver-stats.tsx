@@ -50,13 +50,11 @@ export function ResolverStats() {
   const retrevingMaxAdoptionLimit = async () => {
     try {
       const res = await fetchMaxAdoptionLimit()
-      console.log("maxxinglimit",res)
       setMaxAdoptionLimit(res)
     } catch (error) {
       console.log("error while fetching", error)
     }
   }
-  console.log("prfile-state", profileStats)
   return (
     <div className="space-y-8">
       {/* Stats Cards Section */}
@@ -75,7 +73,7 @@ export function ResolverStats() {
             />
             <StatsCard
               title=" Adopted Disputes"
-              description={`${profileStats?.stats.ongoing}/${disputeStats.maxDailyLimit} adopted `}
+              description={`${profileStats?.stats.ongoing}/${maxAdoptionLimit} adopted `}
               value={`${profileStats?.stats.ongoing}/${maxAdoptionLimit}`}
             />
           </>
