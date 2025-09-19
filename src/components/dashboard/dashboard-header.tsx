@@ -24,11 +24,11 @@ export function DashboardHeader({ activeTab }: DashboardHeaderProps) {
 
   console.log("activeTab", activeTab)
   return (
-    <div className={`${activeTab ==='create'?'md:justify-center':'md:justify-between'} mb-6  flex flex-col gap-4 md:flex-row md:items-center `}>
+    <div className={`${activeTab === 'create' ? 'md:justify-center' : 'md:justify-between'} mb-6  flex flex-col gap-4 md:flex-row md:items-center `}>
       <div>
         <h1
           className={`
-            ${activeTab ==='create'?'text-center':'text-start'}
+            ${activeTab === 'create' ? 'text-center' : 'text-start'}
             text-2xl font-bold bg-gradient-to-r from-zinc-900 to-zinc-700 bg-clip-text text-transparent
           dark:from-white dark:to-zinc-300`}
         >
@@ -36,8 +36,6 @@ export function DashboardHeader({ activeTab }: DashboardHeaderProps) {
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400">{descriptions[activeTab as keyof typeof descriptions]}</p>
       </div>
-
-      
 
       {activeTab !== "create" && (
         <Button
