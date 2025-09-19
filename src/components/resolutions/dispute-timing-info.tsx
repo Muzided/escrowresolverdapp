@@ -36,7 +36,7 @@ const DisputeTimingInfo: React.FC = () => {
   });
 
   const handlePhaseComplete = React.useCallback(async () => {
-    console.log("Phase completed, refetching API...");
+    
     try {
       await refetch();
       console.log("Refetch completed successfully");
@@ -52,7 +52,7 @@ const DisputeTimingInfo: React.FC = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       {resolutionTimes?.disputes && resolutionTimes.disputes.length > 0 && (
