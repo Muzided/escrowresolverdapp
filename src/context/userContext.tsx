@@ -10,6 +10,7 @@ import { toast } from 'react-toastify'
 interface UserContextType {
     user: User | null;
     setUser: (user: User | null) => void;
+    token: string | null;
     getToken: () => string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
@@ -105,6 +106,7 @@ export function UserProvider({ children }: UserProviderProps) {
             user,
             setUser,
             getToken,
+            token,
             isAuthenticated,
             isLoading,
             error

@@ -155,34 +155,34 @@ export const useDispute = () => {
 
 
     const fetchDisputerCoolDown = async (userAddress: string) => {
-  try {
-    if (!multisigFactoryContract) return 0;
+        try {
+            if (!multisigFactoryContract) return 0;
 
-    // Load relevant state
-    const [timeStart, timeFrame, maxResolves, resolvesUsed] = await Promise.all([
-      multisigFactoryContract.windowStart(userAddress),
-      multisigFactoryContract.resolutionWindow(),
-      multisigFactoryContract.maxResolvesPerWindow(),
-      multisigFactoryContract.resolvesInWindow(userAddress),
-    ]);
+            // Load relevant state
+            const [timeStart, timeFrame, maxResolves, resolvesUsed] = await Promise.all([
+                multisigFactoryContract.windowStart(userAddress),
+                multisigFactoryContract.resolutionWindow(),
+                multisigFactoryContract.maxResolvesPerWindow(),
+                multisigFactoryContract.resolvesInWindow(userAddress),
+            ]);
 
-    const endTime = Number(timeStart) + Number(timeFrame);
-    const currentTime = Math.floor(Date.now() / 1000);
+            const endTime = Number(timeStart) + Number(timeFrame);
+            const currentTime = Math.floor(Date.now() / 1000);
 
-    // Only apply cooldown if they've already maxed their resolves
-    if (Number(resolvesUsed) >= Number(maxResolves)) {
-      const remainingTime = endTime - currentTime;
-      return remainingTime > 0 ? remainingTime : 0;
-    }
+            // Only apply cooldown if they've already maxed their resolves
+            if (Number(resolvesUsed) >= Number(maxResolves)) {
+                const remainingTime = endTime - currentTime;
+                return remainingTime > 0 ? remainingTime : 0;
+            }
 
-    // If not at max, no cooldown
-    return 0;
-  } catch (error) {
-    console.error("Error fetching resolver cool down:", error);
-    return 0;
-  }
-};
-    
+            // If not at max, no cooldown
+            return 0;
+        } catch (error) {
+            console.error("Error fetching resolver cool down:", error);
+            return 0;
+        }
+    };
+
 
     const resolveDispute = async (disputeAddress: string, milestoneIndex: number, continueWork: boolean, resolvedInFavorOf: boolean, winnerAddress: string) => {
         let id: any;
@@ -205,7 +205,7 @@ export const useDispute = () => {
                     message: "Dispute resolved successfully"
                 };;
             }
-  console.log("contract", milestoneIndex, resolvedInFavorOf, continueWork)
+            console.log("contract", milestoneIndex, resolvedInFavorOf, continueWork)
             const resolve = await contract.resolveDispute(milestoneIndex, resolvedInFavorOf, continueWork);
             const tx = await resolve.wait();
 

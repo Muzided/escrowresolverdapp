@@ -8,7 +8,8 @@ export const MessageList = React.memo<MessageListProps>(({
   senderId, 
   isLoadingMore, 
   messagePagination, 
-  onLoadMore 
+  onLoadMore ,
+   onNearBottom
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);

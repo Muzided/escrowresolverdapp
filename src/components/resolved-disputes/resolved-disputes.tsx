@@ -44,8 +44,9 @@ export function ResolvedDisputes() {
   };
 
   const handleViewResolutionDetails = async (disputeContractAddress: string,milestoneIndex:number) => {
+    const uniqueKey = `${disputeContractAddress}-${milestoneIndex}`;
     try {
-      setLoadingStates(prev => ({ ...prev, [disputeContractAddress]: true }));
+      setLoadingStates(prev => ({ ...prev, [uniqueKey]: true }));
       
       const response = await getDisputedResolutionHistory(disputeContractAddress,milestoneIndex);
       setSelectedResolution(response.data);
@@ -55,7 +56,7 @@ export function ResolvedDisputes() {
       console.error("Error fetching resolution details:", error);
       
     } finally {
-      setLoadingStates(prev => ({ ...prev, [disputeContractAddress]: false }));
+      setLoadingStates(prev => ({ ...prev, [uniqueKey]: false }));
     }
   };
 
@@ -176,9 +177,9 @@ console.log("adoptedDispute", adoptedDispute)
                             size="sm"
                             className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
                             onClick={() => handleViewResolutionDetails(dispute.disputeContractAddress,dispute.milestone_index)}
-                            disabled={loadingStates[dispute.disputeContractAddress]}
+                            disabled={loadingStates[`${dispute.disputeContractAddress}-${dispute.milestone_index}`]}
                           >
-                            {loadingStates[dispute.disputeContractAddress] ? (
+                            {loadingStates[`${dispute.disputeContractAddress}-${dispute.milestone_index}`] ? (
                               <div className="flex items-center gap-2">
                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                 Loading...
@@ -282,8 +283,18 @@ console.log("adoptedDispute", adoptedDispute)
                     </div>
                     <div className="flex items-center gap-2">
                       <DollarSign className="w-4 h-4 text-yellow-500 flex-shrink-0" />
-                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total returned amount:</span>
-                      <span className="text-xs font-semibold">{selectedResolution.resolution.total_returned_amount} USDT</span>
+                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Amount returned to receiver:</span>
+                      <span className="text-xs font-semibold">{selectedResolution.resolution.receiver_returned_amount} USDT</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Amount returned to creator:</span>
+                      <span className="text-xs font-semibold">{selectedResolution.resolution.creator_returned_amount} USDT</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Total affected amount :</span>
+                      <span className="text-xs font-semibold">{selectedResolution.resolution.creator_returned_amount + selectedResolution.resolution.receiver_returned_amount} USDT</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-purple-500 flex-shrink-0" />
