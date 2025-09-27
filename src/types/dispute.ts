@@ -117,6 +117,8 @@ export interface DisputeResolution {
   continue_work: boolean;
   is_milestone_dispute: boolean;
   affected_milestones: AffectedMilestone[];
+  receiver_returned_amount:number;
+  creator_returned_amount:number;
   total_returned_amount: number;
   tx_hash: string;
   resolution_date: string;

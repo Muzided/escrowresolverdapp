@@ -59,13 +59,15 @@ export default function RootLayout({
             <AppKit>
 
               <Web3Provider>
+                 <UserProvider>
                 <SocketProvider>
-                  <UserProvider>
+                 
                     <EscrowProvider>
                       {children}
                     </EscrowProvider>
-                  </UserProvider>
+                 
                 </SocketProvider>
+                 </UserProvider>
               </Web3Provider>
             </AppKit>
           </QueryClientProvider>

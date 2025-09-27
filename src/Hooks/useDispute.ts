@@ -129,31 +129,60 @@ export const useDispute = () => {
     }, [signer]);
 
     //fetch disputer cool downtime
+    // const fetchDisputerCoolDown = async (userAddress: string) => {
+    //     try {
+
+    //         if (!multisigFactoryContract) return 0;
+    //         const timeStart = await multisigFactoryContract.windowStart (userAddress);
+    //         const timeFrame = await multisigFactoryContract.resolutionWindow();
+
+    //         // Calculate end time by adding timeFrame to timeStart
+    //         const endTime = Number(timeStart) + Number(timeFrame);
+
+    //         // Get current time in seconds
+    //         const currentTime = Math.floor(Date.now() / 1000);
+
+    //         // Calculate remaining cooldown time
+    //         const remainingTime = endTime - currentTime;
+
+    //         // Return 0 if time has expired, otherwise return remaining time
+    //         return remainingTime > 0 ? remainingTime : 0;
+    //     } catch (error) {
+    //         console.error("Error fetching resolver cool down:", error);
+    //         return 0;
+    //     }
+    // }
+
+
     const fetchDisputerCoolDown = async (userAddress: string) => {
         try {
-
             if (!multisigFactoryContract) return 0;
-            const timeStart = await multisigFactoryContract.windowStart(userAddress);
-            const timeFrame = await multisigFactoryContract.resolutionWindow();
 
-            // Calculate end time by adding timeFrame to timeStart
+            // Load relevant state
+            const [timeStart, timeFrame, maxResolves, resolvesUsed] = await Promise.all([
+                multisigFactoryContract.windowStart(userAddress),
+                multisigFactoryContract.resolutionWindow(),
+                multisigFactoryContract.maxResolvesPerWindow(),
+                multisigFactoryContract.resolvesInWindow(userAddress),
+            ]);
+
             const endTime = Number(timeStart) + Number(timeFrame);
-
-            // Get current time in seconds
             const currentTime = Math.floor(Date.now() / 1000);
 
-            // Calculate remaining cooldown time
-            const remainingTime = endTime - currentTime;
+            // Only apply cooldown if they've already maxed their resolves
+            if (Number(resolvesUsed) >= Number(maxResolves)) {
+                const remainingTime = endTime - currentTime;
+                return remainingTime > 0 ? remainingTime : 0;
+            }
 
-            // Return 0 if time has expired, otherwise return remaining time
-            return remainingTime > 0 ? remainingTime : 0;
+            // If not at max, no cooldown
+            return 0;
         } catch (error) {
             console.error("Error fetching resolver cool down:", error);
             return 0;
         }
-    }
+    };
 
-    
 
     const resolveDispute = async (disputeAddress: string, milestoneIndex: number, continueWork: boolean, resolvedInFavorOf: boolean, winnerAddress: string) => {
         let id: any;
@@ -176,7 +205,7 @@ export const useDispute = () => {
                     message: "Dispute resolved successfully"
                 };;
             }
-
+            console.log("contract", milestoneIndex, resolvedInFavorOf, continueWork)
             const resolve = await contract.resolveDispute(milestoneIndex, resolvedInFavorOf, continueWork);
             const tx = await resolve.wait();
 

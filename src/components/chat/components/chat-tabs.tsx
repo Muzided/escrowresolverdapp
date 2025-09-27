@@ -25,7 +25,7 @@ export const ChatTabs: React.FC<ChatTabsProps> = ({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const handleMessageReceived = useCallback((message: ChatMessage) => {
-    console.log("message-received",message)
+    console.log("message-received", message)
     setAllMessages(prev => {
       const exists = prev.some(msg => msg.message_id === message.message_id);
       if (exists) return prev;
@@ -35,6 +35,7 @@ export const ChatTabs: React.FC<ChatTabsProps> = ({
 
   const {
     sendMessage: socketSendMessage,
+    markAsRead,
     isConnected,
     error: socketError
   } = useSocketChat({
@@ -48,6 +49,13 @@ export const ChatTabs: React.FC<ChatTabsProps> = ({
       setAllMessages(messages);
     }
   }, [messages]);
+
+  // Mark as read when chat opens/updates
+  useEffect(() => {
+    if (conversationId && senderId) {
+      markAsRead(conversationId, senderId);
+    }
+  }, [conversationId, senderId, markAsRead]);
 
   const handleSendMessage = useCallback((message: string, media: Media | null = null) => {
     if ((!message.trim() && !media) || !conversationId) return;

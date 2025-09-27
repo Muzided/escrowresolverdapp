@@ -7,7 +7,7 @@ import { ConversationMessagesResponse } from "@/types/conversation"
 export const startConversation = async (requestData: startConversationRequest) => {
     try {
         const response = await axiosService.post<ConversationResponse>('api/conversation/start', requestData)
-
+ console.log("response from starting conversation", response)
         return response
     } catch (error) {
         console.log("error while starting conversation", error)

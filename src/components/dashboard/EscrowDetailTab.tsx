@@ -6,7 +6,7 @@ import { EscrowDetails } from "@/components/escrowdetail/escrow-details"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-const EscrowDetailTab = ({escrowId}:{escrowId:string}) => {
+const EscrowDetailTab = ({ escrowId }: { escrowId: string }) => {
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-zinc-50 to-white dark:bg-black dark:from-black dark:to-black
     container mx-auto p-4 space-y-6">

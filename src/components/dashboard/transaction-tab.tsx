@@ -30,8 +30,6 @@ import { getStatusStyles } from "../../../utils/helper"
 import { useRouter } from "next/navigation"
 import PageHeading from "../ui/pageheading"
 
-
-
 type FormattedEscrow = {
   id: string;
   amount: string;
@@ -43,7 +41,6 @@ type FormattedEscrow = {
   reversal: string;
   createdAt: string;
 };
-
 
 export function TransactionsTab() {
   const [statusFilter, setStatusFilter] = useState<string>("creator-escrows")
@@ -63,11 +60,9 @@ export function TransactionsTab() {
   //next-router
   const router = useRouter()
 
-
-
-const navgateToDetailPage=(id:string)=>{
-  router.push(`/escrow/${id}`)
-}
+  const navgateToDetailPage = (id: string) => {
+    router.push(`/escrow/${id}`)
+  }
 
   const { fetchCreatorEscrows, fetchReceiverEscrows, fetchPaymentRequest, requestPayment, releaseFunds, approvePayment, initaiteDispute, resolveDispute } = useFactory();
   const { fetchEscrowDetails } = useEscrow();
@@ -123,6 +118,7 @@ const navgateToDetailPage=(id:string)=>{
       setCreatedEscrows([]); // Ensure state consistency in case of an error
     }
   };
+
   //user claimable escrows
   const fetchClaimAbleEscrows = async (userAddress: string) => {
     try {
@@ -172,20 +168,11 @@ const navgateToDetailPage=(id:string)=>{
   const filteredEscrows =
     statusFilter === "creator-escrows" ? userTransactionHistory : escrows;
 
-
-
-
-  
-
-
-  console.log("filteredEscrows", filteredEscrows)
-
-
-  
   return (
     <div className="space-y-4">
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-    <Button
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Button
           variant="outline"
           className="flex items-center gap-2 border-zinc-200 bg-white shadow-sm text-zinc-700 
             hover:bg-zinc-50 hover:border-zinc-300 hover:shadow-md transition-all duration-200
@@ -211,10 +198,10 @@ const navgateToDetailPage=(id:string)=>{
             <SelectItem value="claimable-escrows">Disputed Escrows</SelectItem>
           </SelectContent>
         </Select>
-        </div>
+      </div>
 
       <Tabs defaultValue="table" className="w-full ">
-      
+
 
         <TabsContent value="table" className="mt-0">
           <div className="rounded-md border border-zinc-200 dark:border-zinc-800">
@@ -257,26 +244,26 @@ const navgateToDetailPage=(id:string)=>{
                       </TableCell>
 
                       <TableCell>
-                      {escrow.tx_hash}
+                        {escrow.tx_hash}
                       </TableCell>
 
                       <TableCell>
-                      {escrow.type}
+                        {escrow.type}
                       </TableCell>
 
                       <TableCell>
-                          {escrow.date}
+                        {escrow.date}
                       </TableCell>
 
                       {/* viewEscrow details */}
-                          <Button
-                            size="sm"
-                            disabled={loadingEscrows[escrow.escrowAddress] || false}
-                            className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
-                            onClick={() => navgateToDetailPage("3f4#fsd4")}
-                          >
-                            View Details
-                          </Button>
+                      <Button
+                        size="sm"
+                        disabled={loadingEscrows[escrow.escrowAddress] || false}
+                        className="bg-[#9C5F2A] text-white hover:bg-[#9C5F2A] my-2 w dark:bg-[#9C5F2A] dark:text-white dark:hover:bg-[#9C5F2A]"
+                        onClick={() => navgateToDetailPage("3f4#fsd4")}
+                      >
+                        View Details
+                      </Button>
                     </TableRow>
                   ))
                 )}
@@ -285,10 +272,11 @@ const navgateToDetailPage=(id:string)=>{
           </div>
         </TabsContent>
 
-    
 
-      
+
+
       </Tabs>
+
     </div>
   )
 }

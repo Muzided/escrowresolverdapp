@@ -72,14 +72,15 @@ export function DisputeResolution() {
     router.push(`/escrow/${id}`)
   }
 
-
+console.log("checking some stuff",disputedEscrows?.disputes)
 
   const handleViewDetails = async (disputeAddress: string, disputeType: string, disputeId: number) => {
     try {
       setLoadingStates(prev => ({ ...prev, [disputeAddress]: true }))
 
       const reason = await fetchDisputeReason(disputeAddress, disputeId)
-      setDisputeReason(reason || "No dispute reason found")
+      console.log("dispute reason", reason)
+      setDisputeReason(reason)
       setDisputeModalOpen(true)
     } catch (error) {
       console.error("Error fetching dispute reason:", error)
@@ -264,7 +265,7 @@ export function DisputeResolution() {
                         {escrow.dispute_contract_address?.slice(0, 8)}...{escrow.dispute_contract_address?.slice(-7)}
                       </TableCell>
                       <TableCell>
-                        {escrow.escrowDetails.escrow_contract_address?.slice(0, 8)}...{escrow.escrowDetails.escrow_contract_address?.slice(-7)} </TableCell>
+                        {escrow.escrowDetails?.escrow_contract_address?.slice(0, 8)}...{escrow.escrowDetails?.escrow_contract_address?.slice(-7)} </TableCell>
                       {/* <TableCell>
                         {escrow.reason.slice(0, 12)}...
                           <Dialog>

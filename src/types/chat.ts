@@ -2,12 +2,20 @@ export interface startChatRequest {
   otherUserId: string;
 }
 
+
+
 export interface ConversationResponse {
+  success: boolean;
+  conversation: Conversation;
+}
+
+export interface Conversation {
   _id: string;
-  participants: string[];
+  participantHash: string;
   disputeId: string;
-  createdAt: string;
   __v: number;
+  createdAt: string;
+  participants: string[];
 }
 
 export interface startConversationRequest {
@@ -36,6 +44,7 @@ export interface UseSocketChatProps {
 export interface UseSocketChatReturn {
   sendMessage: (message: string | null, media: Media | null) => void;
   isConnected: boolean;
+   markAsRead: (conversationId: string, userId: string) => void;
   error: string | null;
 }
 
@@ -102,6 +111,7 @@ export interface MessageListProps {
   isLoadingMore: boolean;
   messagePagination: ChatPagination;
   onLoadMore: (pagination: number) => Promise<void>;
+   onNearBottom?: () => void;
 }
 
 export interface MessageInputProps {

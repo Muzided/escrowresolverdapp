@@ -1,6 +1,7 @@
 import { axiosService } from "../apiConfig"
 import { AdoptedDisputeStates, ResolvedByMonthArray, resolverStats } from "@/types/resolver"
 import { DisputeResolutionResponse } from "@/types/dispute"
+import { toast } from "react-toastify"
 
 
 export const getResolverStats = async () => {
@@ -45,9 +46,12 @@ export const getResolverGraphData = async () => {
     }
 }
 
-export const getDisputedResolutionHistory = async (disputeContractAddress: string) => {
+export const getDisputedResolutionHistory = async (disputeContractAddress: string,milestoneIndex:number) => {
     try {
-        const response = await axiosService.get<DisputeResolutionResponse>(`api/transaction/getDisputeResolutionTransaction/${disputeContractAddress}`)
+        if(!disputeContractAddress || milestoneIndex===undefined){
+           toast.error("Invalid parameters for fetching resolution history")
+        }
+        const response = await axiosService.get<DisputeResolutionResponse>(`api/transaction/getDisputeResolutionTransaction/${disputeContractAddress}/${milestoneIndex}`);
         return response;
     } catch (error) {
         console.log("error while fetching resolution history", error)
