@@ -33,7 +33,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 	useEffect(() => {
 		const token = getToken()
 		if (!token) {
-			toast.error('No authentication token found. Please log in.')
+			// toast.error('No authentication token found. Please log in.')
 			return
 		}
 
@@ -42,7 +42,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
 
 		try {
-			const url = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000'
+			const url = process.env.NEXT_PUBLIC_SOCKET_URL || 'https://escrow.ipcre8.com'
 			socketRef.current = io(url, {
 				auth: {
 					token: token
