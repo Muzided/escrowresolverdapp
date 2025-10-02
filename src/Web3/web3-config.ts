@@ -1,4 +1,4 @@
-export const MultiSig_Factory_Address ="0xd0cd6cf3dec1fdec1c37645a400d2e99956789a1";
+export const MultiSig_Factory_Address ="0x72d8568a58a6ead32142a5532ca84e951a15a295";
 //0xc994D54c079b59FcCe46bC6007Cd196c1D0A8348 verifed contract address
 export const Usdt_Contract_Address ="0xc365Fc4c14259b861Dddbe771618ab9258da32f3"
 export const escrow_Contract_Address ="0x949e1BA0ff30a792D1C4e7276dDCAC923187BAB5";
