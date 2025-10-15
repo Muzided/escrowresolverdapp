@@ -5,6 +5,7 @@ import { getConversationMedia } from '@/services/Api/chat/chat';
 import { ConversationMessage, ConversationMessagesResponse } from '@/types/conversation';
 import { useUser } from '@/context/userContext';
 import { MediaTabProps } from '@/types/chat';
+import { mediaURl } from '@/services/Api/apiConfig';
 
 export const MediaTab: React.FC<MediaTabProps> = ({ conversationId }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,7 +88,7 @@ export const MediaTab: React.FC<MediaTabProps> = ({ conversationId }) => {
                 </div>
               </div>
               <a
-                href={`https://escrow.ipcre8.com${data.media.url}`}
+                href={`${mediaURl}${data.media.url}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-500 hover:underline"

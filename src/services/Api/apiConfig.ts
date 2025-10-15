@@ -21,15 +21,16 @@ export interface ApiResponse<T = any> {
 
 // Error response type
 
-
+export const mediaURl  = process.env.NEXT_PUBLIC_MEDIA_URL || 'https://escrow.ipcre8.com';  
 
 class AxiosService {
   private static instance: AxiosService;
   private axiosInstance: AxiosInstance;
 
   private constructor() {
+    const NEXT_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://escrow.ipcre8.com/';
     this.axiosInstance = axios.create({
-      baseURL: 'https://escrow.ipcre8.com/',
+      baseURL: NEXT_API_URL,
       timeout: 50000,
       headers: {
         'Content-Type': 'application/json',

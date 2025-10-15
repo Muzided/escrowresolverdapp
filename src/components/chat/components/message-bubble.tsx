@@ -1,6 +1,7 @@
 import React from 'react';
 import { Paperclip } from 'lucide-react';
 import { MessageBubbleProps } from '@/types/chat';
+import { mediaURl } from '@/services/Api/apiConfig';
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwn }) => {
   return (
@@ -24,10 +25,10 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwn }) 
             {message.media?.type === 'image' ? (
               <div className="mb-2">
                 <img
-                  src={`https://escrow.ipcre8.com${message?.media?.url}`}
+                  src={`${mediaURl}${message?.media?.url}`}
                   alt={message.media.originalName || 'Image'}
                   className="max-w-full sm:max-w-xs md:max-w-sm lg:max-w-md rounded-lg cursor-pointer hover:opacity-90 transition-opacity object-cover"
-                  onClick={() => window.open(`https://escrow.ipcre8.com${message?.media?.url}`, '_blank')}
+                  onClick={() => window.open(`${mediaURl}${message?.media?.url}`, '_blank')}
                 />
               </div>
             ) : (
@@ -42,7 +43,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwn }) 
                   </p>
                 </div>
                 <a
-                  href={`https://escrow.ipcre8.com${message.media.url}`}
+                  href={`${mediaURl}${message.media.url}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-500 hover:text-blue-600 text-sm"

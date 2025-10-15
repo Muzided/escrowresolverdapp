@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useRef, useState, ReactNod
 import { io, Socket } from 'socket.io-client'
 import { useUser } from './userContext'
 import { toast } from 'react-toastify'
+import { mediaURl } from '@/services/Api/apiConfig'
 
 interface SocketContextType {
 	socket: Socket | null
@@ -42,7 +43,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
 
 		try {
-			const url = process.env.NEXT_PUBLIC_SOCKET_URL || 'https://escrow.ipcre8.com'
+			const url = mediaURl
 			socketRef.current = io(url, {
 				auth: {
 					token: token
